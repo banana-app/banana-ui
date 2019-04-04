@@ -1,0 +1,60 @@
+.ui.fluid.search .results {
+    width: 35em !important;
+}
+
+.ui.search > .results .result .image {
+    float: left !important;
+    overflow: hidden;
+    background: 0 0;
+    width: 4em !important;
+    height: 6em !important;
+}
+
+.ui.search > .results .result .image + .content {
+    margin: 0 0 0 5em !important;
+    color: #839496 !important;
+}
+
+.ui.search > .results .result .image + .content.search {
+    margin: 0 0 0 0.5em !important;
+}
+
+.ui.search > .results .result .content.search .meta.search {
+    margin-top: 3px;
+}
+
+.items > .placeholder {
+    opacity: 0.03 !important;
+}
+
+.faded.placeholder {
+    opacity: 0.03 !important;
+}
+
+.top.breadcrumb {
+    margin-top: 6px;
+}
+
+.ui.compact.list {
+    margin-top: 0.2em !important;
+}
+
+.fade-enter {
+    opacity: 0;
+    z-index: 1;
+}
+  
+.fade-enter.fade-enter-active {
+    opacity: 1;
+    transition: opacity 1000ms ease-in;
+}
+
+.fade-exit {
+    opacity: 1;
+    z-index: 1;
+}
+  
+.fade-exit.fade-exit-active {
+    opacity: 0;
+    transition: opacity 2000ms ease-in;
+}
