@@ -1,57 +1,93 @@
 import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Transition } from 'semantic-ui-react'
-import { RatingLabel, formatTitle, GenreLabel, SourceLabel } from '../common/MediaItem'
+import {RatingLabel, formatTitle, GenreLabel, SourceLabel, Poster} from '../common/MediaItem'
 import { QualityLabel, ResolutionLabel } from '../unmatched/MediaFile'
 import { Popup } from 'semantic-ui-react'
 import axios from 'axios'
 import _ from 'lodash'
 import store from '../common/ErrorPopup'
 import moment from 'moment'
+import PropTypes from "prop-types";
+import Breadcrumb, {BreadcrumbItem} from "../Breadcrumb";
 
 const truncate = (term) => {
     return _(term).truncate({ length: 60 })
-}
+};
+
+const VideoFile = (props) => {
+    return <Popup trigger={<NavLink to={props.link_to}><i className="file video outline icon"></i>{truncate(props.name)}</NavLink>} wide>
+        <Popup.Header>
+            <QualityLabel quality={props.quality}/>
+            <ResolutionLabel resolution={props.resolution}/>
+        </Popup.Header>
+        <Popup.Content>
+            {props.name}
+        </Popup.Content>
+    </Popup>;
+};
+
+const Folder = (props) => {
+    return <Popup trigger={<div><i className="folder icon"></i>{truncate(props.name)}</div>} wide>
+        <Popup.Content>
+            {props.name}
+        </Popup.Content>
+    </Popup>;
+};
+
+
+VideoFile.propTypes = {
+    link_to: PropTypes.string,
+    quality: PropTypes.string,
+    resolution: PropTypes.string,
+    name: PropTypes.string
+};
 
 export class MatchedMedia extends Component {
     render() {
         return (<tr>
             <td>
                 <div className="ui basic segment">
-                    
+
                     <div class="ui two column very relaxed grid">
-                        
+
                         <div className="column">
                             <div className="ui list">
                                 <div className="item">
-                                    <div className="header"><i className="file video outline icon"></i>
-                                        <NavLink to={`/unmatched/${this.props.id}/${this.props.name}`}>{truncate(this.props.name)}</NavLink> <span />
+                                    <div className="header">
+
+                                        <VideoFile link_to={`/movies`}
+                                                   quality={this.props.quality} resolution={this.props.resolution}
+                                                   name={this.props.target_name}/>
                                     </div>
-                                    <div className="description"><i className="folder icon"></i>{truncate(this.props.directory)}</div>
+                                    <div className="description">
+                                        <Folder name={this.props.target_directory} />
+                                    </div>
                                 </div>
                             </div>
-                        </div> {/* column */}
+                        </div>
+                        {/* column */}
 
                         <div className class="column">
                             <div className="ui list">
                                 <div className="item">
-                                    <div className="header"><i className="file video outline icon"></i>
-                                    <Popup 
-                                        trigger={<NavLink to={`/unmatched/${this.props.id}/${this.props.target_name}`}>{truncate(this.props.target_name)}</NavLink>} 
-                                    >
-                                        <Popup.Content>
-                                            <QualityLabel quality={this.props.quality} />
-                                            <ResolutionLabel resolution={this.props.resolution} />
-                                            {this.props.name}
-                                        </Popup.Content>
-                                    </Popup>
+                                    <div className="header">
+
+                                        <VideoFile link_to={`movies`}
+                                                   quality={this.props.quality} resolution={this.props.resolution}
+                                                   name={this.props.name}/>
+
                                     </div>
-                                    <div className="description"><i className="folder icon"></i>{truncate(this.props.target_directory)}</div>
+                                    <div className="description">
+                                        <Folder name={this.props.directory}/>
+                                    </div>
                                 </div>
                             </div>
-                        </div> {/* column */}
-                    
-                    </div> { /* grid */}
+                        </div>
+                        {/* column */}
+
+                    </div>
+                    { /* grid */}
 
                     <div className="ui vertical divider">
                         <i className="ui icon linkify"></i>
@@ -96,25 +132,29 @@ class Movie extends Component {
                     })
 
             })
-    }
+    };
 
     render() {
         return (
+
             <div className="ui container">
+                <div className="top breadcrumb">
+                    <Breadcrumb>
+                        <BreadcrumbItem to="/movies" name="Movies" />
+                        <BreadcrumbItem
+                            to={`/movies/${this.props.match.params.movie_id}/${encodeURI(formatTitle(this.state.movie.title,
+                                this.state.movie.release_year))}`}
+                            name={`${formatTitle(this.state.movie.title,this.state.movie.release_year)}`}
+                        final />
+                    </Breadcrumb>
+                </div>
                 <div className="ui relaxed divided items">
                     <div className="item">
 
-                        <Transition
-                            transitionOnMount={true}
-                            animation="fade"
-                            duration="500"
-                        >
-                            <div className="ui fluid medium image">
-                                <img className="medium image" src={this.state.movie.poster} />
-                            </div>
+                        <div className="ui fluid medium image">
+                            <Poster poster={this.state.movie.poster} />
+                        </div>
 
-
-                        </Transition>
 
                         <Transition
                             transitionOnMount={true}

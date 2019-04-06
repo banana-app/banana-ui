@@ -10,7 +10,7 @@ import Tabs from './Tabs.js'
 import Ribbon from './Ribbon.js'
 import Breadcrumb from './Breadcrumb.js'
 import Unmatched from './unmatched/Unmatched'
-import UnmachedItem from './unmatched/UnmatchedItem'
+import UnmatchedItem from './unmatched/UnmatchedItem'
 import MatchItem from './match/MatchItem'
 import Jobs from './jobs/Jobs'
 import Dashboard from './dashboard/Dashboard';
@@ -32,11 +32,11 @@ class Banana extends Component {
       <div>
         <Router>
           <Route
-            render={({ location }) => (
-
+            render={({ history }) => (
               <React.Fragment>
                 <Redirect from='/' to='dashboard'/>
-                <Ribbon />
+                  
+                  <Route path={"*"} component={Ribbon}/>
                 
                   <Route path={['/dashboard', '/movies', '/shows', '/unmatched' ]} component={Tabs} />
                   
@@ -47,7 +47,7 @@ class Banana extends Component {
                   <Route exact path="/unmatched" component={Unmatched} />
                   <Route exact path="/unmatched/:id/:item/match/:source/:match_candidate_id" component={MatchItem} />
 
-                  <Route exact path="/unmatched/:id/:item" component={UnmachedItem} />
+                  <Route exact path="/unmatched/:id/:item" component={UnmatchedItem} />
                   <Route exact path="/movies/:movie_id/:title" component={Movie} />
                   <Route exact path="/movies" component={Movies} />
                   <Route exact path="/shows" component={Shows} />

@@ -1,40 +1,46 @@
 import React, { Component } from 'react'
 import { observer } from 'mobx-react'
 import { NavLink } from 'react-router-dom'
+import { Route } from 'react-router'
 import jobStore from './common/JobsStore'
 import { Search } from 'semantic-ui-react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import { formatTitle, HighQualityMoviePoster } from './common/MediaItem'
+import { formatTitle, Poster } from './common/MediaItem'
+import { ResolutionLabel } from './unmatched/MediaFile'
 import { throttleAdapterEnhancer, cacheAdapterEnhancer } from 'axios-extensions'
 import _ from 'lodash'
 
 
-export const MovieResultRenderer = ({ plot, title, poster, release_year, original_title, source_id, category }) => {
+export const MovieResultRenderer = ({ plot, title, poster, release_year, original_title, source_id, category, resolution, summary }) => {
 
     return (
         <React.Fragment>
-        {category.includes('movie') &&
-        <React.Fragment>
-            <div className="ui image">
-                <HighQualityMoviePoster poster={poster} />
-            </div>
-            <div className="content">
-                <strong>{category} - {formatTitle(title, release_year)}</strong>
-                <div className="meta">
-                    <span>{original_title && original_title}</span>
-                </div>
-                <div className="description">
-                </div>
-                <div className="extra">
-                    <p>{_.truncate(plot, { length: 200 })}</p>
-                </div>
-            </div>
-        </React.Fragment>
-        }
-        {category.includes('media') &&
-            <div>{title}</div>
-        }
+            {category.includes('movie') &&
+                <React.Fragment>
+                    <div className="ui image">
+                        <Poster poster={poster} />
+                    </div>
+                    <div className="content">
+                        <strong>{category} - {formatTitle(title, release_year)}</strong>
+                        <div className="meta">
+                            <span>{original_title && original_title}</span>
+                        </div>
+                        <div className="description">
+                        </div>
+                        <div className="extra">
+                            <p>{_.truncate(plot, { length: 200 })}</p>
+                        </div>
+                    </div>
+                </React.Fragment>
+            }
+            {category.includes('media') &&
+                <div><ResolutionLabel resolution={resolution}/>{title}</div>
+            }
+            
+            {category.includes('summary') &&
+                <div style={{textAlign: "center"}}><h4>{summary}</h4></div>
+            }
         </React.Fragment>
     )
 }
@@ -46,8 +52,9 @@ MovieResultRenderer.propTypes = {
     release_year: PropTypes.string,
     original_title: PropTypes.string,
     source_id: PropTypes.string,
-    category: PropTypes.string
-}
+    category: PropTypes.string,
+    resolution: PropTypes.string
+};
 
 export const JobIndicator = observer(class JobIndicator extends Component {
 
@@ -83,21 +90,28 @@ class Ribbon extends Component {
     handleSearchChange = (e, { value }) => {
         console.log("Search...")
         this.setState({ isLoading: true, value: value, results: [] })
-        this.search.get(`/api/movies/search?title=${value}&source=local`)
+        this.search.get(`/api/movies/search/local?title=${value}&source=local`)
             .then((movies) => {
 
-              
+
                 this.search.get(`/api/media/search?term=${value}`)
                     .then((media) => {
                         this.setState({ results: [] })
 
-                        this.setState({ isLoading: false, results: 
-                            [...movies.data.map(s => ({ ...s, key: s.source_id, category: "movie" })),
-                            ...media.data.map(s => ({ title: s.filename, key: s.id, category: "media" }))]
+                        let aggregated = [...movies.data.results.map(s => ({ ...s, key: s.source_id, category: "movie" })),
+                        ...media.data.results.map(s => ({ title: s.filename, key: s.id, resolution: s.container, category: "media" }))]
+
+                        if (movies.data.total_results > 3 || media.data.total_results > 3)
+                            aggregated.push(
+                                { summary: `View all ${movies.data.total_results + media.data.total_results} results`, category: 'summary'}        
+                            )
+
+                        this.setState({
+                            isLoading: false, results: aggregated
                         })
 
                     })
-              
+
             })
 
 
@@ -110,46 +124,50 @@ class Ribbon extends Component {
 
     render() {
         return (
-            <div className="ribbon">
-                <div className="ui container">
-                    <div className="ui right floated text menu">
-                        <div className="icon item">
-                            <i className="wrench icon"></i>
+
+            <Route render={({ history }) => (
+
+                <div className="ribbon">
+                    <div className="ui container">
+                        <div className="ui right floated text menu">
+                            <div className="icon item">
+                                <i className="wrench icon"></i>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="ui right floated text menu">
-                        <NavLink to='/jobs' className="icon item">
-                            <JobIndicator jobStore={jobStore} />
+                        <div className="ui right floated text menu">
+                            <NavLink to='/jobs' className="icon item">
+                                <JobIndicator jobStore={jobStore} />
 
-                            {/*<div class="floating ui circular mini yellow label">2</div>*/}
-                        </NavLink>
-                    </div>
+                                {/*<div class="floating ui circular mini yellow label">2</div>*/}
+                            </NavLink>
+                        </div>
 
-                    <div className="ui text menu">
-                        <NavLink to='/movies'>
-                            <img src="/img/banana.png" className="ui right spaced image mini" />
-                        </NavLink>
+                        <div className="ui text menu">
+                            <NavLink to='/movies'>
+                                <img src="/img/banana.png" className="ui right spaced image mini" />
+                            </NavLink>
 
-                        <Search
-                            resultRenderer={MovieResultRenderer}
-                            onSearchChange={this.handleSearchChange}
-                            onResultSelect={this.handleResultSelect}
-                            results={this.state.results}
-                            loading={this.state.isLoading}
-                            placeholder={"Search..."}
-                            value={this.state.value}
+                            <Search
+                                resultRenderer={MovieResultRenderer}
+                                onSearchChange={this.handleSearchChange}
+                                onResultSelect={this.handleResultSelect}
+                                results={this.state.results}
+                                loading={this.state.isLoading}
+                                placeholder={"Search..."}
+                                value={this.state.value}
 
-                            fluid
-                            {...this.props}
-                        />
+                                fluid
+                                {...this.props}
+                            />
+
+                        </div>
 
                     </div>
 
                 </div>
-
-            </div>
-        );
+            )} />
+        )
     }
 
 }

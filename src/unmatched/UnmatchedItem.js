@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import _ from 'lodash'
-import MediaItem, { HighQualityMoviePoster, formatTitle, SourceLabel, GenreLabel } from '../common/MediaItem';
+import MediaItem, { Poster, formatTitle, SourceLabel, GenreLabel } from '../common/MediaItem';
 import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb';
 import axios from 'axios';
 import { Search, Dropdown } from 'semantic-ui-react'
 import { PropTypes } from 'prop-types'
 import { Route } from 'react-router'
-import { NavLink } from 'react-router-dom'
 import { throttleAdapterEnhancer, cacheAdapterEnhancer } from 'axios-extensions';
 import MediaFile from './MediaFile'
 
@@ -14,14 +13,14 @@ import MediaFile from './MediaFile'
 const searchSourceOptions = [
     { "text": 'TMDb', "value": 'tmdb' },
     { "text": 'IMDb', "value": 'imdb' },
-]
+];
         
 export const MovieResultRenderer = ({ plot, title, poster, release_year, original_title, source_id }) => {
 
     return (
             <div key={source_id} className="item">
                 <div className="ui tiny image">
-                    <HighQualityMoviePoster poster={poster} />
+                    <Poster poster={poster} />
                 </div>
                 <div className="content">
                     <strong>{formatTitle(title, release_year)}</strong>
@@ -36,7 +35,7 @@ export const MovieResultRenderer = ({ plot, title, poster, release_year, origina
                 </div>
             </div>
     )
-}
+};
  
 MovieResultRenderer.propTypes = {
     title: PropTypes.string,
@@ -45,10 +44,9 @@ MovieResultRenderer.propTypes = {
     release_year: PropTypes.string,
     original_title: PropTypes.string,
     source_id: PropTypes.string
-}
+};
 
-class UnmachedItem extends Component {
-
+class UnmatchedItem extends Component {
 
     state = {
         unmatched_item: { potential_matches: [], parsed_media_item: {} },
@@ -56,47 +54,44 @@ class UnmachedItem extends Component {
         results: [],
         value: '',
         searchSource: searchSourceOptions[0].value
-    }
+    };
 
     componentDidMount = () => {
         axios.get(`/api/unmatched/${this.props.match.params.id}/${this.props.match.params.item}`)
             .then((result) => {
                 this.setState({ unmatched_item: result.data })
             })
-    }
+    };
 
-    resetComponent = () => this.setState({ isLoading: false, results: [], value: '' })
+    resetComponent = () => this.setState({ isLoading: false, results: [], value: '' });
 
     search = axios.create({
         baseURL: `/`,
         headers: { 'Cache-Control': 'no-cache' },
         adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter), { threshold: 5000 })
-    })
+    });
 
 
     handleSearchChange = (e, { value }) => {
-        this.setState({ isLoading: true, value: value })
+        this.setState({ isLoading: true, value: value });
         this.search.get(`/api/movies/search?title=${value}&source=${this.state.searchSource}&for_item=${this.state.unmatched_item.id}`)
             .then((result) => {
                 this.setState({ results: [] })
                 // above clearing state is to fix strange bug with react semantic-ui search component
-                let uid = this.state.unmatched_item.id
                 this.setState({ isLoading: false, results: result.data })
             })
-    }
+    };
 
     handleResultSelect = (e, { result }) => {
         let to = encodeURI(`/unmatched/${this.state.unmatched_item.id}/${formatTitle(result.title, result.release_year)}/match/${result.source}/${result.source_id}`)
         this.props.history.push(to)
-    }
+    };
 
     handleSearchSourceChange = (e, { value }) => {
         this.setState({ searchSource: value })
-    }
+    };
 
     render() {
-
-        
 
         return (
             <Route render={({ history }) => (
@@ -107,12 +102,10 @@ class UnmachedItem extends Component {
                         <BreadcrumbItem to={this.props.match.url} name={this.props.match.params.item} final />
                     </Breadcrumb>
                     </div>
-                    <div class="ui basic segment">
+                    <div className="ui basic segment">
 
-                        <div class="ui items">
+                        <div className="ui items">
 
-                            
-                            
                             <MediaFile 
                                 title={this.state.unmatched_item.parsed_media_item.title}
                                 filename={this.state.unmatched_item.parsed_media_item.filename}
@@ -124,30 +117,30 @@ class UnmachedItem extends Component {
                                 path={this.state.unmatched_item.parsed_media_item.path}
                             />
 
-                            <div class="ui icon dark grey message">
-                                <i class="frown icon"></i>
-                                <div class="content">
-                                    <div class="header">
+                            <div className="ui icon dark grey message">
+                                <i className="frown icon"></i>
+                                <div className="content">
+                                    <div className="header">
                                         OK, so what happened here?
                                     </div>
                                     <p>Well, we tried to find best match for Your new awesome movie, but we feel that we
                                         need Your help. We are not quite sure what we have found is totally okay.
                                         We rather don't want to mess with Your library. So please review, what we've
-                            found and help us get things fixed. Thanks! <i class="icon beer"></i></p>
+                            found and help us get things fixed. Thanks! <i className="icon beer"></i></p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="ui horizontal divider">
+                        <div className="ui horizontal divider">
                             Now, You can
                         </div>
 
-                        <div class="ui basic segment">
-                            <div class="ui two column very relaxed stackable grid">
-                                <div class="column">
+                        <div className="ui basic segment">
+                            <div className="ui two column very relaxed stackable grid">
+                                <div className="column">
 
-                                    <div class="ui basic segment">
-                                        <div class="ui header"><i class="icon search"></i>
+                                    <div className="ui basic segment">
+                                        <div className="ui header"><i class="icon search"></i>
                                             Search  <Dropdown inline
                                                 defaultValue={searchSourceOptions[0].value}
                                                 options={searchSourceOptions}
@@ -155,7 +148,7 @@ class UnmachedItem extends Component {
                                         </div>
                                     </div>
 
-                                    <div class="ui basic segment">
+                                    <div className="ui basic segment">
                                         <Search
                                             onSearchChange={this.handleSearchChange}
                                             onResultSelect={this.handleResultSelect}
@@ -173,10 +166,10 @@ class UnmachedItem extends Component {
                                 </div>
 
 
-                                <div class="column">
-                                    <div class="ui relaxed divided items">
-                                        <div class="ui basic segment">
-                                            <div class="ui header"><i class="icon magic"></i>Help Us to choose, the right one, we
+                                <div className="column">
+                                    <div className="ui relaxed divided items">
+                                        <div className="ui basic segment">
+                                            <div className="ui header"><i class="icon magic"></i>Help Us to choose, the right one, we
                                     think You may like</div>
                                         </div>
 
@@ -203,7 +196,7 @@ class UnmachedItem extends Component {
 
                                 </div>
                             </div>
-                            <div class="ui vertical divider">
+                            <div className="ui vertical divider">
                                 Or
                             </div>
                         </div>
@@ -217,4 +210,4 @@ class UnmachedItem extends Component {
 
 }
 
-export default UnmachedItem;
+export default UnmatchedItem;

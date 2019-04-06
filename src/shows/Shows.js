@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb'
-import { MediaItemPlaceholder2 } from '../match/MatchItem'
+import { MediaItemPlaceholder } from '../match/MatchItem'
 
 class Shows extends Component {
 
@@ -13,12 +13,12 @@ class Shows extends Component {
                 <BreadcrumbItem to="/shows/Friends" name="Friends" final/>
             </Breadcrumb>
             </div>
-            <MediaItemPlaceholder2/>
-            <MediaItemPlaceholder2/>
-            <MediaItemPlaceholder2/>
-            <MediaItemPlaceholder2/>
-            <MediaItemPlaceholder2/>
-            <MediaItemPlaceholder2/>
+            <MediaItemPlaceholder/>
+            <MediaItemPlaceholder/>
+            <MediaItemPlaceholder/>
+            <MediaItemPlaceholder/>
+            <MediaItemPlaceholder/>
+            <MediaItemPlaceholder/>
             </div>
         )
     }

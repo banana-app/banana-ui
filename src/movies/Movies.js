@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import MediaItem, { GenreLabel, formatTitle } from '../common/MediaItem';
 import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb'
 import { Dropdown, Pagination } from 'semantic-ui-react'
-import { MediaItemPlaceholder2 }  from '../match/MatchItem'
+import { MediaItemPlaceholder }  from '../match/MatchItem'
 import axios from 'axios'
 import _ from 'lodash'
 
@@ -68,7 +68,7 @@ class Movies extends Component {
                 </MediaItem>
             }
             {!_.isUndefined(m.placeholder) &&
-                <MediaItemPlaceholder2/>
+                <MediaItemPlaceholder/>
             }
             </React.Fragment>
         

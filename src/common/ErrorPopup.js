@@ -45,9 +45,9 @@ export const ErrorPopup = observer(class ErrorPopup extends Component {
             <div className="ui container">
                 <div className="ui yellow bottom attached inverted segment">{store.error.message}
 
-                    <a className="ui right floated text menu">
+                    <div className="ui right floated text menu">
                         <a href="#" onClick={this.handlePopupClose}><i className="small icon close"></i></a>
-                    </a>
+                    </div>
 
                 </div>
             </div>

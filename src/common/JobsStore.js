@@ -1,18 +1,17 @@
-import { observable, decorate, computed } from 'mobx'
+import {computed, decorate, observable} from 'mobx'
 import io from 'socket.io-client'
 import _ from 'lodash'
 
-const socket = io("http://localhost:5000/jobs")
+const socket = io(`http://localhost:3000/jobs`)
 
 socket.on("media_scanner", (data) => {
     let event = JSON.parse(data)
-    console.log(event)
     jobStore.events[event.job_id] = new JobContext(event.job_type, event.event_type, event.current_item, event.total_items)
 })
 
 socket.on("manual_match", (data) => {
     let event = JSON.parse(data)
-    console.log(event)
+    jobStore.events[event.job_id] = new JobContext(event.job_type, event.event_type, event.current_item, event.total_items)
 })
 
 export class JobContext {
@@ -45,12 +44,11 @@ class JobStore {
     events = {}
 
     get hasActiveJobs() {
-        let val = _.keys(this.events).length > 0 && _.some(_.values(this.events), (e) => e.event_type === 'progress')
-        return val
+        return _.keys(this.events).length > 0 && _.some(_.values(this.events), (e) => e.event_type === 'progress')
     }
 
     get activeJobs() {
-        if (_.keys(this.events).length == 0)
+        if (_.keys(this.events).length === 0)
             return []
         else
             return _.values(this.events).filter((e) => e.event_type === 'progress')
@@ -59,7 +57,8 @@ class JobStore {
 
 decorate(JobStore, {
     events: observable,
-    hasActiveJobs: computed
+    hasActiveJobs: computed,
+    activeJobs: computed
 })
 
 const jobStore = window.jobStore = new JobStore()

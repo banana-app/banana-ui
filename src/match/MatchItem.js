@@ -3,38 +3,17 @@ import { Route } from 'react-router-dom'
 import axios from 'axios'
 import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb'
 import MediaFile from '../unmatched/MediaFile'
-import MediaItem, { GenreLabel, formatTitle, HighQualityMoviePoster } from '../common/MediaItem'
+import MediaItem, { GenreLabel, formatTitle, Poster } from '../common/MediaItem'
 import _ from 'lodash'
 import ContentLoader from 'react-content-loader'
 
-/*
-const MediaItemPlaceholder = ({props}) => {
-    return (<div className="item">
-        <ContentLoader
-            height={48.6}
-            width={400}
-            speed={4}
-            primaryColor="#073642"
-            secondaryColor="#586e75"
-        >
-            <rect x="37" y="1" width="100" height="6" />
-            <rect x="37" y="10" width="85" height="6" />
-            <rect x="37" y="22" width="130" height="3" />
-            <rect x="37" y="28" width="80" height="3" />
-            <rect x="1" y="1" width="29" height="43.5" />
-        </ContentLoader>
-    </div>)
-}
-*/
-
-export const MediaItemPlaceholder2 = ({ props }) => {
+export const MediaItemPlaceholder = ({props}) => {
     return (<div className="ui relaxed divided items">
-
 
         <div className="item placeholder">
 
             <div className="ui tiny image">
-                <HighQualityMoviePoster poster={""} />
+                <Poster poster={""} />
             </div>
 
             <div className="content">
@@ -54,7 +33,7 @@ export const MediaItemPlaceholder2 = ({ props }) => {
         </div>
 
     </div>);
-}
+};
 
 class MatchItem extends Component {
 
@@ -63,24 +42,25 @@ class MatchItem extends Component {
         match_candidate: {},
         loading: true,
         ready: false
-    }
+    };
 
     componentDidMount = () => {
 
         axios.get(`/api/unmatched/${this.props.match.params.id}/${this.props.match.params.item}`)
             .then((result) => {
                 this.setState({ parsed_media_item: result.data.parsed_media_item })
-            })
+            });
 
         axios.get(`/api/movies/sources/${this.props.match.params.source}/${this.props.match.params.match_candidate_id}`)
             .then((result) => {
+                console.log(result.data)
                 this.setState({ match_candidate: result.data, loading: false, ready: true })
             })
-    }
+    };
 
     handleMatch = (e) => {
-        this.setState({loading: true})
-        let p = this.props.match.params
+        this.setState({loading: true});
+        let p = this.props.match.params;
 
         axios.post("/api/movies", {
             match_type: p.source,
@@ -88,14 +68,14 @@ class MatchItem extends Component {
             match_type_id: p.match_candidate_id
         })
             .then((result) => {
-                let movie = result.data
+                let movie = result.data;
                 this.props.history.push(`/movies/${movie.id}/${formatTitle(movie.title, movie.release_year)}`)
             })
-    }
+    };
 
     handleCancel = (e) => {
         this.props.history.push(`/unmatched/${this.props.match.params.id}/${this.state.parsed_media_item.filename}`)
-    }
+    };
 
     render() {
 
@@ -150,7 +130,7 @@ class MatchItem extends Component {
                                 </MediaItem>
                             }
                             {!this.state.ready &&
-                                <MediaItemPlaceholder2 />
+                                <MediaItemPlaceholder />
                             }
 
 

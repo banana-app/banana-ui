@@ -3,52 +3,24 @@ import { observer } from 'mobx-react'
 import { reaction } from 'mobx'
 import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb'
 import _ from 'lodash'
-import { formatTitle } from '../common/MediaItem'
+import {formatTitle, Poster} from '../common/MediaItem'
 import axios from 'axios'
 import { Transition } from 'semantic-ui-react'
-import Img from 'react-image'
-import placeholder from '../img/poster_placeholder.png'
 import jobsStore from '../common/JobsStore'
 import { NavLink } from 'react-router-dom'
+import PropTypes from 'prop-types'
 
 
-class CompactMediaItem extends Component {
-
-
-    state = { paceholderVisible: true, placeholderClass: "ui hidden image hidden", posterClass: "ui hidden image" }
-
-    handlePosterLoad = (e) => {
-        this.setState(
-            {
-                paceholderVisible: false
-            }
-        )
-    }
+class DashboardMediaItem extends Component {
 
     render() {
         return (
             <div className="column">
 
                 <NavLink to={this.props.link_to}>
-                    <div className="ui fluid small image">
+                    <div className="ui fluid small rounded image">
+                        <Poster poster={this.props.poster} />
 
-                        <Img
-                            src={`${this.props.poster}`}
-                            container={children => {
-                                return (
-                                    <Transition
-                                        transitionOnMount={true}
-                                        unmountOnHide={true}
-                                        animation="fade"
-                                        duration="500"
-                                    >
-                                        {children}
-                                    </Transition>
-                                )
-                            }}
-                            loader={<img src={placeholder} className="faded placeholder" />}
-                            unloader={<img src={placeholder} className="faded placeholder" />}
-                        />
                         <Transition
                             transitionOnMount={true}
                             unmountOnHide={true}
@@ -66,17 +38,21 @@ class CompactMediaItem extends Component {
                         </Transition>
                     </div>
                 </NavLink>
-
             </div>
         )
     }
 }
 
+DashboardMediaItem.propTypes = {
+    poster: PropTypes.string,
+    link_to: PropTypes.string
+};
+
 const Dashboard = observer(
 
     class Dashboard extends Component {
 
-        fetchRecentyAdded = () => {
+        fetchMostRecentlyAdded = () => {
             axios.get(`/api/movies?page=1&order_by=created_datetime&order_direction=desc`)
                 .then(result =>
                     this.setState({
@@ -84,23 +60,20 @@ const Dashboard = observer(
                         total_items: result.data.total_items,
                     })
                 )
-        }
+        };
 
-        refereshRecentyAdded = reaction(
+        refereshRecentlyAdded = reaction(
             () => jobsStore.activeJobs.map((j) => j.timestamp),
             (data) => {
-                console.log("Reaction!!!!!!")
-                console.log(data)
-                this.fetchRecentyAdded()
+                this.fetchMostRecentlyAdded()
             }
-        )
+        );
 
         state = { movies: [], total_items: 0 }
 
         componentDidMount = () => {
-            this.fetchRecentyAdded()
-        }
-
+            this.fetchMostRecentlyAdded()
+        };
 
         render() {
 
@@ -109,32 +82,26 @@ const Dashboard = observer(
 
                     <div className="top breadcrumb">
                         <Breadcrumb>
-                            <BreadcrumbItem to="/movies" name="Dashboard" final />
+                            <BreadcrumbItem to="/dashboard" name="Dashboard" final />
                         </Breadcrumb>
                     </div>
 
-                    <div class="ui basic segment">
-                        <h3 class="ui header">Recently added movies</h3>
-
+                    <div className="ui basic segment">
+                        <h3 className="ui header">Recently added movies</h3>
                         <div className="ui six column grid">
-
                             {this.state.movies.map((m) =>
-                                <CompactMediaItem poster={m.poster}
+                                <DashboardMediaItem poster={m.poster}
                                     title={formatTitle(m.title, m.release_year)}
                                     link_to={`/movies/${m.id}/${encodeURI(formatTitle(m.title, m.release_year))}`} />
                             )}
                         </div>
-
                     </div>
-                    {/* Grid */}
+                    {/* Recently added movies */}
 
                 </div>
             )
-
         }
-
     }
-
-)
+);
 
 export default Dashboard
