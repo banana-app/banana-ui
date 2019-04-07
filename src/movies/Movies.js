@@ -1,8 +1,7 @@
-import React, { Component } from 'react'
-import MediaItem, { GenreLabel, formatTitle } from '../common/MediaItem';
-import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb'
-import { Dropdown, Pagination } from 'semantic-ui-react'
-import { MediaItemPlaceholder }  from '../match/MatchItem'
+import React, {Component} from 'react'
+import MediaItem, {formatTitle, GenreLabel, MediaItemPlaceholder} from '../common/MediaItem';
+import Breadcrumb, {BreadcrumbItem} from '../Breadcrumb'
+import {Dropdown, Pagination} from 'semantic-ui-react'
 import axios from 'axios'
 import _ from 'lodash'
 
@@ -11,7 +10,7 @@ const sortOptions = [
     { "text" : 'Date added', "value" : 'dateAddedAsc', icon: 'arrow down' },
     { "text" : 'By title', "value" : 'titleDesc', icon: 'arrow down' },
     { "text" : 'By title', "value" : 'titleAsc', icon: 'arrow up'  },
-]
+];
 
 export const MoviesContext = React.createContext("movies")
 

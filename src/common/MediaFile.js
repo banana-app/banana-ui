@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import * as PropTypes from "prop-types";
 
 export const Folder = (props) => {
     return (
@@ -6,7 +7,7 @@ export const Folder = (props) => {
             <i className="icon folder"></i>{props.path}
         </React.Fragment>
     )
-}
+};
 
 export const ResolutionLabel = (props) => {
     return (<React.Fragment >
@@ -14,7 +15,7 @@ export const ResolutionLabel = (props) => {
             <div className="ui yellow small horizontal label">{props.resolution}</div>
         }
     </React.Fragment >)
-}
+};
 
 
 export const QualityLabel = (props) => {
@@ -23,7 +24,7 @@ export const QualityLabel = (props) => {
             <div className="ui green small horizontal label">{props.quality}</div>
         }
     </React.Fragment>)
-}
+};
 
 export const TitleLabel = (props) => {
 
@@ -35,7 +36,7 @@ export const TitleLabel = (props) => {
             </div>
         }
     </React.Fragment>)
-}
+};
 
 export const YearLabel = (props) => {
     return (<React.Fragment>
@@ -46,7 +47,7 @@ export const YearLabel = (props) => {
             </div>
         }
     </React.Fragment>)
-}
+};
 
 export const SeasonLabel = (props) => {
     return (<React.Fragment>
@@ -57,7 +58,7 @@ export const SeasonLabel = (props) => {
             </div>
         }
     </React.Fragment>)
-}
+};
 
 export const EpisodeLabel = (props) => {
     return (<React.Fragment>
@@ -68,39 +69,52 @@ export const EpisodeLabel = (props) => {
             </div>
         }
     </React.Fragment>)
-}
+};
 
+EpisodeLabel.propTypes = {
+    episode: PropTypes.string
+};
+
+const VideoFile = (props) => {
+    return <div className="header"><i className="icon video"></i>{props.filename}
+        {props.children}
+    </div>;
+};
+
+VideoFile.propTypes = {
+    filename: PropTypes.string
+};
 
 class MediaFile extends Component {
 
     render() {
         return (
-            <React.Fragment>
             <div className="item">
+
                 <div className="content">
-                    <a className="header"> <i className="icon video"></i>{this.props.filename}</a>
+                    {this.props.children}
+                    <VideoFile filename={this.props.filename}></VideoFile>
 
                     <div className="meta">
 
-                        <ResolutionLabel resolution={this.props.resolution} />
-                        <QualityLabel quality={this.props.quality} />
-                        <TitleLabel title={this.props.title} />
-                        <YearLabel year={this.props.year} />
-                        <SeasonLabel season={this.props.season} />
-                        <EpisodeLabel episode={this.props.episode} />
+                        <ResolutionLabel resolution={this.props.resolution}/>
+                        <QualityLabel quality={this.props.quality}/>
+                        <TitleLabel title={this.props.title}/>
+                        <YearLabel year={this.props.year}/>
+                        <SeasonLabel season={this.props.season}/>
+                        <EpisodeLabel episode={this.props.episode}/>
                     </div>
 
                     <div className="description">
-                        <p></p>
+                        <p/>
                     </div>
 
                     <div className="extra">
-                        <Folder path={this.props.path} />
+                        <Folder path={this.props.path}/>
                     </div>
 
                 </div>
             </div>
-            </React.Fragment>
             )
     }
 }

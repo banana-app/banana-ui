@@ -23,12 +23,15 @@
     margin-top: 3px;
 }
 
+.ui.inline.dropdown .dropdown.icon {
+    display: inline-block !important;
+}
+
 .items > .placeholder {
     opacity: 0.03 !important;
 }
 
 .faded.placeholder {
-    opacity: 0.03 !important;
 }
 
 .top.breadcrumb {

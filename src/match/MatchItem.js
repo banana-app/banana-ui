@@ -1,39 +1,9 @@
-import React, { Component } from 'react'
-import { Route } from 'react-router-dom'
+import React, {Component} from 'react'
+import {Route} from 'react-router-dom'
 import axios from 'axios'
-import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb'
-import MediaFile from '../unmatched/MediaFile'
-import MediaItem, { GenreLabel, formatTitle, Poster } from '../common/MediaItem'
-import _ from 'lodash'
-import ContentLoader from 'react-content-loader'
-
-export const MediaItemPlaceholder = ({props}) => {
-    return (<div className="ui relaxed divided items">
-
-        <div className="item placeholder">
-
-            <div className="ui tiny image">
-                <Poster poster={""} />
-            </div>
-
-            <div className="content">
-                █████████████████████████████████
-
-                    <div className="meta">
-                    <GenreLabel rating="     " />
-                    <GenreLabel rating="        " />
-                </div>
-
-                <div className="description" >
-                    <h5>█████████████████████████████████████████████████████</h5>
-                    <h5>█████████████████</h5>
-                </div>
-            </div>
-
-        </div>
-
-    </div>);
-};
+import Breadcrumb, {BreadcrumbItem} from '../Breadcrumb'
+import MediaFile from '../common/MediaFile'
+import MediaItem, {formatTitle, MediaItemPlaceholder} from '../common/MediaItem'
 
 class MatchItem extends Component {
 

@@ -65,6 +65,7 @@ SourceLabel.propTypes = {
     source: PropTypes.string
 };
 
+
 export class Poster extends Component {
 
     render() {
@@ -98,7 +99,7 @@ Poster.propTypes = {
 };
 
 
-const NumberOfMediaItems = (props) => {
+const NumberOfMediaFiles = (props) => {
     return <React.Fragment>
         {props.media_items && props.media_items > 1 &&
         <div className="ui red label top right attached mini">
@@ -108,11 +109,11 @@ const NumberOfMediaItems = (props) => {
     </React.Fragment>;
 };
 
-NumberOfMediaItems.propTypes = {
+NumberOfMediaFiles.propTypes = {
     media_items: PropTypes.number
 };
 
-NumberOfMediaItems.propTypes = {media_items: PropTypes.number};
+NumberOfMediaFiles.propTypes = {media_items: PropTypes.number};
 
 class MediaItem extends Component {
 
@@ -132,7 +133,7 @@ class MediaItem extends Component {
                             <div className="ui tiny rounded image">
                                 <Poster poster={this.props.poster}/>
                             </div>
-                            <NumberOfMediaItems media_items={this.props.media_items}/>
+                            <NumberOfMediaFiles media_items={this.props.media_items}/>
                             </React.Fragment>
                         </Transition>
                     }
@@ -146,7 +147,7 @@ class MediaItem extends Component {
                                 <div className="ui tiny rounded image">
                                     <Poster poster={this.props.poster}/>
                                 </div>
-                                <NumberOfMediaItems media_items={this.props.media_items}/>
+                                <NumberOfMediaFiles media_items={this.props.media_items}/>
                             </NavLink>
                         </Transition>
                     }
@@ -195,13 +196,32 @@ class MediaItem extends Component {
     }
 }
 
-/*
-MediaItem.propTypes = {
-    poster: PropTypes.string,
-    plot: PropTypes.string,
-    title: PropTypes.string,
-    year: PropTypes.string,
-    media_items: PropTypes.number
-}*/
+export const MediaItemPlaceholder = ({props}) => {
+    return (<div className="ui relaxed divided items">
+
+        <div className="item placeholder">
+
+            <div className="ui tiny image">
+                <Poster poster={""}/>
+            </div>
+
+            <div className="content">
+                █████████████████████████████████
+
+                <div className="meta">
+                    <GenreLabel rating="     "/>
+                    <GenreLabel rating="        "/>
+                </div>
+
+                <div className="description">
+                    <h5>█████████████████████████████████████████████████████</h5>
+                    <h5>█████████████████</h5>
+                </div>
+            </div>
+
+        </div>
+
+    </div>);
+};
 
 export default MediaItem;

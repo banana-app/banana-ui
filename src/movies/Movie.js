@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Transition } from 'semantic-ui-react'
 import {RatingLabel, formatTitle, GenreLabel, SourceLabel, Poster} from '../common/MediaItem'
-import { QualityLabel, ResolutionLabel } from '../unmatched/MediaFile'
+import { QualityLabel, ResolutionLabel } from '../common/MediaFile'
 import { Popup } from 'semantic-ui-react'
 import axios from 'axios'
 import _ from 'lodash'
@@ -36,6 +36,7 @@ const Folder = (props) => {
 };
 
 
+
 VideoFile.propTypes = {
     link_to: PropTypes.string,
     quality: PropTypes.string,
@@ -56,7 +57,7 @@ export class MatchedMedia extends Component {
                                 <div className="item">
                                     <div className="header">
 
-                                        <VideoFile link_to={`/movies`}
+                                        <VideoFile link_to={this.props.link_to}
                                                    quality={this.props.quality} resolution={this.props.resolution}
                                                    name={this.props.target_name}/>
                                     </div>
@@ -135,6 +136,10 @@ class Movie extends Component {
     };
 
     render() {
+
+        let movie = this.state.movie;
+        let title = formatTitle(movie.title, movie.release_year);
+
         return (
 
             <div className="ui container">
@@ -142,9 +147,8 @@ class Movie extends Component {
                     <Breadcrumb>
                         <BreadcrumbItem to="/movies" name="Movies" />
                         <BreadcrumbItem
-                            to={`/movies/${this.props.match.params.movie_id}/${encodeURI(formatTitle(this.state.movie.title,
-                                this.state.movie.release_year))}`}
-                            name={`${formatTitle(this.state.movie.title,this.state.movie.release_year)}`}
+                            to={`/movies/${this.props.match.params.movie_id}/${encodeURI(title)}`}
+                            name={title}
                         final />
                     </Breadcrumb>
                 </div>
@@ -152,7 +156,7 @@ class Movie extends Component {
                     <div className="item">
 
                         <div className="ui fluid medium image">
-                            <Poster poster={this.state.movie.poster} />
+                            <Poster poster={movie.poster} />
                         </div>
 
 
@@ -164,18 +168,18 @@ class Movie extends Component {
                             <div className="ui content">
 
                                 <div className="header">
-                                    <div className="ui medium header">{formatTitle(this.state.movie.title, this.state.movie.release_year)}</div>
+                                    <div className="ui medium header">{title}</div>
                                 </div>
 
                                 <div className="meta">
-                                    {!_.eq(this.state.movie.title, this.state.movie.original_title) &&
+                                    {!_.eq(movie.title, movie.original_title) &&
                                         <div className="ui small header">
-                                            {formatTitle(this.state.movie.original_title, this.state.movie.release_year)}
+                                            {formatTitle(movie.original_title, movie.release_year)}
                                         </div>
                                     }
-                                    <SourceLabel source={this.state.movie.source} />
-                                    <RatingLabel rating={this.state.movie.rating} />
-                                    {this.state.movie.genres.map(g =>
+                                    <SourceLabel source={movie.source} />
+                                    <RatingLabel rating={movie.rating} />
+                                    {movie.genres.map(g =>
                                         <GenreLabel key={g.id} genre={g.name} />
                                     )}
                                 </div>
@@ -213,16 +217,18 @@ class Movie extends Component {
                     </thead>
                     <tbody>
 
-                        {this.state.movie.media_items.map(i =>
+                        {movie.media_items.map(media =>
                             <MatchedMedia
-                                name={i.filename}
-                                target_name={i.target_filename}
-                                id={i.id}
-                                directory={i.path}
-                                target_directory={i.target_path}
-                                quality={i.quality}
-                                resolution={i.resolution}
-                                created_datetime={i.created_datetime} />
+                                name={media.filename}
+                                target_name={media.target_filename}
+                                key={media.id}
+                                directory={media.path}
+                                target_directory={media.target_path}
+                                quality={media.quality}
+                                resolution={media.resolution}
+                                created_datetime={media.created_datetime}
+                                link_to={`/movies/${movie.id}/media/${media.id}`}
+                            />
                         )}
 
                     </tbody>

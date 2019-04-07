@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb';
 import axios from 'axios';
 import { Pagination } from 'semantic-ui-react';
-import { QualityLabel, ResolutionLabel} from './MediaFile'
+import { QualityLabel, ResolutionLabel} from '../common/MediaFile'
 import moment from 'moment'
 
 export class UnmatchedItem extends Component{
