@@ -6,7 +6,6 @@ import MediaFile from '../common/MediaFile'
 import MediaItem, {formatTitle, MediaItemPlaceholder} from '../common/MediaItem'
 import {Dropdown, Menu} from "semantic-ui-react";
 import {Transition} from "semantic-ui-react";
-import _ from 'lodash'
 import MovieSearch from "./MovieSearch";
 
 /*
@@ -64,6 +63,13 @@ class TransitionSwitch extends Component {
         this.setState({source: value})
     };
 
+    handleResultSelect = (e, {result}) => {
+        // "/movies/:movie_id/media/:media_id/fixmatch/:source/:match_candidate_id"
+        let {media_id, movie_id} = this.props.match.params;
+        let to = encodeURI(`/movies/${movie_id}/media/${media_id}/fixmatch/${result.source}/${result.source_id}`);
+        this.props.history.push(to)
+    };
+
     render() {
 
         let s = this.state;
@@ -78,7 +84,10 @@ class TransitionSwitch extends Component {
                     onHide={this.onFixMatchHide}
                     onShow={this.onFixMatchShow}
                 >
+                    <div className="ui three column grid">
+                        <div className="column"></div>
 
+                        <div className="column">
                             <div className="ui center aligned basic segment">
                                 <div className="ui icon header"><i className="icon search"></i>
                                     Find a movie or show on <Dropdown inline
@@ -89,9 +98,12 @@ class TransitionSwitch extends Component {
                                 </div>
                                 <MovieSearch
                                     source={this.state.source}
+                                    onResultSelect={this.handleResultSelect}
                                 />
                             </div>
-
+                            <div className="column"></div>
+                        </div>
+                    </div>
                 </Transition>
                 <Transition
                     animation={"fade"}
@@ -177,26 +189,6 @@ class MovieMediaFile extends Component {
                 this.setState({movie: result.data, loading: false, ready: true})
             })
     };
-    /*
-        handleMatch = (e) => {
-            this.setState({loading: true});
-            let p = this.props.match.params;
-
-            axios.post("/api/movies", {
-                match_type: p.source,
-                unmatched_item_id: p.id,
-                match_type_id: p.match_candidate_id
-            })
-                .then((result) => {
-                    let movie = result.data;
-                    this.props.history.push(`/movies/${movie.id}/${formatTitle(movie.title, movie.release_year)}`)
-                })
-        };
-
-        handleCancel = (e) => {
-            this.props.history.push(`/unmatched/${this.props.match.params.id}/${this.state.parsed_media_item.filename}`)
-        };
-    */
 
     handleMenuItemSelect = (action) => {
         this.setState({
@@ -280,7 +272,8 @@ class MovieMediaFile extends Component {
                         year={movie.release_year}
                         poster={movie.poster}
                         ready={this.state.ready}
-                        action={this.state.action}/>
+                        action={this.state.action}
+                        {...this.props} />
 
                 </div>
             )}>
