@@ -32,7 +32,7 @@ class Banana extends Component {
                     <Route
                         render={({history}) => (
                             <React.Fragment>
-                                <Redirect from='/' to='/dashboard'/>
+
 
                                 <Route path={"*"} component={Ribbon}/>
 

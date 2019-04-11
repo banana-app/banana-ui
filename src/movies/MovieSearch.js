@@ -54,11 +54,11 @@ class MovieSearch extends Component {
     handleSearchChange = (e, {value}) => {
         this.setState({isLoading: true, value: value});
         let source = this.props.source;
-        this.search.get(`/api/movies/search?title=${value}&source=${source}`)
+        this.search.get(`/api/sources/${source}/search?title=${value}`)
             .then((result) => {
                 this.setState({results: []})
                 // above clearing state is to fix strange bug with react semantic-ui search component
-                this.setState({isLoading: false, results: result.data})
+                this.setState({isLoading: false, results: result.data.results})
             })
     };
 

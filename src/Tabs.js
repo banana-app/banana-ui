@@ -34,7 +34,7 @@ const Tabs = observer(
             (data) => {
                 this.fetchCounts()
             }
-    )
+    );
 
 
 

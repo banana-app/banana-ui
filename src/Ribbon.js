@@ -90,7 +90,7 @@ class Ribbon extends Component {
     handleSearchChange = (e, {value}) => {
         console.log("Search...")
         this.setState({isLoading: true, value: value, results: []})
-        this.search.get(`/api/movies/search/local?title=${value}&source=local`)
+        this.search.get(`/api/sources/local/search?title=${value}`)
             .then((movies) => {
 
 
