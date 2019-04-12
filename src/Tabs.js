@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { BrowserRouter as Router, NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import axios from 'axios'
 import { observer } from 'mobx-react'
 import { reaction } from 'mobx'
@@ -21,13 +21,13 @@ const Tabs = observer(
             this.setState({ unmatched_total_items: result.data.total_items })
         })
 
-        }
+        };
 
-    state = { movies_total_items: undefined, unmatched_total_items: undefined }
+    state = { movies_total_items: undefined, unmatched_total_items: undefined };
 
     componentDidMount = () => {
         this.fetchCounts()
-    }
+    };
 
     refreshCounts = reaction(
         () => jobsStore.activeJobs.map((j) => j.timestamp),
@@ -70,6 +70,6 @@ const Tabs = observer(
 
 }
 
-)
+);
 
 export default Tabs;

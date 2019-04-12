@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import './App.css';
-import {BrowserRouter as Router, Route, Redirect} from 'react-router-dom'
-import {ErrorPopup} from './common/ErrorPopup'
-import Movies from './movies/Movies.js'
-import Movie from './movies/Movie.js'
-import Shows from './shows/Shows.js'
+import {BrowserRouter as Router, Route} from 'react-router-dom'
+import Toasts from './common/Toasts'
+import Movies from './movies/Movies'
+import Movie from './movies/Movie'
+import Shows from './shows/Shows'
 import Tabs from './Tabs.js'
 import Ribbon from './Ribbon.js'
 import Unmatched from './unmatched/Unmatched'
@@ -15,8 +15,6 @@ import Dashboard from './dashboard/Dashboard';
 import MovieMediaFile from "./movies/MovieMediaFile";
 import FixMatchItem from "./match/FixMatchItem";
 
-
-const Home = () => (<h1>Home</h1>)
 
 const Show = ({match}) => (<h1>Show {match.params.show}</h1>)
 const Series = ({match}) => (<h1>Series {match.params.series}</h1>)
@@ -38,7 +36,7 @@ class Banana extends Component {
 
                                 <Route path={['/dashboard', '/movies', '/shows', '/unmatched']} component={Tabs}/>
 
-                                <ErrorPopup/>
+                                <Toasts/>
 
                                 <Route exact path='/dashboard' component={Dashboard}/>
                                 <Route exact path='/jobs' component={Jobs}/>

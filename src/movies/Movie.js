@@ -6,7 +6,7 @@ import {QualityLabel, ResolutionLabel} from '../common/MediaFile'
 import {Popup} from 'semantic-ui-react'
 import axios from 'axios'
 import _ from 'lodash'
-import store from '../common/ErrorPopup'
+import Toasts from '../common/Toasts'
 import moment from 'moment'
 import PropTypes from "prop-types";
 import Breadcrumb, {BreadcrumbItem} from "../Breadcrumb";
@@ -79,7 +79,7 @@ export class MatchedMedia extends Component {
             <td>
                 <div className="ui basic segment">
 
-                    <div class="ui two column very relaxed grid">
+                    <div className="ui two column very relaxed grid">
 
                         <div className="column">
                             <div className="ui list">
@@ -98,7 +98,7 @@ export class MatchedMedia extends Component {
                         </div>
                         {/* column */}
 
-                        <div className class="column">
+                        <div className="column">
                             <div className="ui list">
                                 <div className="item">
                                     <div className="header">
@@ -133,7 +133,7 @@ export class MatchedMedia extends Component {
 export const CastItem = (props) => {
     return (
         <div className="item">
-            <img className="ui avatar image"
+            <img alt="" className="ui avatar image"
                  src={props.profile_picture}/>
             <div className="content">
                 <div className="header">{props.character}</div>
@@ -156,8 +156,7 @@ class Movie extends Component {
                         this.setState({cast: result.data})
                     })
                     .catch(error => {
-                        store.error.message = error.message
-                        store.error.raised = true
+                        Toasts.error(error.message);
                     })
 
             })
@@ -221,9 +220,10 @@ class Movie extends Component {
                                 {this.state.cast.length > 0 &&
                                 <div className="ui basic vertical segment">
                                     <h4>Cast</h4>
-                                    <div class="ui horizontal list">
+                                    <div className="ui horizontal list">
                                         {this.state.cast.map(c =>
-                                            <CastItem name={c.name}
+                                            <CastItem key={c.id}
+                                                      name={c.name}
                                                       profile_picture={c.profile_picture}
                                                       character={c.character}/>
                                         )}

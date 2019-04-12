@@ -7,7 +7,7 @@ import MediaItem, {formatTitle, MediaItemPlaceholder} from '../common/MediaItem'
 import {Progress} from "semantic-ui-react";
 import {observer} from "mobx-react";
 import {when} from "mobx"
-import jobStore from "../common/JobsStore"
+import jobStore, { JobContext } from "../common/JobsStore"
 import _ from 'lodash'
 
 const MatchItem = observer(
@@ -47,7 +47,7 @@ const MatchItem = observer(
                 .then((result) => {
                     let job = result.data;
                     when(
-                        () => _.some(jobStore.jobs, {event_type: "completed", job_id: job.job_id}),
+                        () => _.some(jobStore.jobs, {event_type: JobContext.COMPLETED, job_id: job.job_id}),
                         () => {
                             this.props.history.push(`/movies?job_id=${job.job_id}`)
                         }

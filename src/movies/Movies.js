@@ -61,9 +61,10 @@ class Movies extends Component {
     movieMediaItem = (m) => {
         return (
 
-            <React.Fragment key={m.id}>
+            <React.Fragment>
                 {_.isUndefined(m.placeholder) &&
                 <MediaItem
+                    key={m.id}
                     poster={m.poster}
                     plot={m.plot}
                     title={m.title}
@@ -71,17 +72,17 @@ class Movies extends Component {
                     media_items={m.media_items.length}
                     link_to={encodeURI(`/movies/${m.id}/${encodeURI(formatTitle(m.title, m.release_year))}`)}>
                     {m.genres.map(g =>
-                        <GenreLabel genre={g.name}/>
+                        <GenreLabel key={g.id} genre={g.name}/>
                     )}
                 </MediaItem>
                 }
                 {!_.isUndefined(m.placeholder) &&
-                <MediaItemPlaceholder/>
+                <MediaItemPlaceholder key={m.id}/>
                 }
             </React.Fragment>
 
         )
-    }
+    };
 
     render() {
         return (
@@ -97,7 +98,7 @@ class Movies extends Component {
                 {this.state.movies.map(m =>
                     this.movieMediaItem(m)
                 )}
-                <div class="ui right floated pagination menu">
+                <div className="ui right floated pagination menu">
 
                     {this.state.pages > 1 &&
                     <Pagination

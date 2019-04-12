@@ -5,8 +5,8 @@ import Breadcrumb, {BreadcrumbItem} from '../Breadcrumb'
 import MediaFile from '../common/MediaFile'
 import MediaItem, {formatTitle, MediaItemPlaceholder} from '../common/MediaItem'
 import {Dropdown, Menu} from "semantic-ui-react";
-import {Transition} from "semantic-ui-react";
 import MovieSearch from "./MovieSearch";
+import TransitionDeck from "./TransitionDeck";
 
 /*
 
@@ -20,151 +20,6 @@ const searchSourceOptions = [
     {"text": 'IMDb', "value": 'imdb'},
 ];
 
-class TransitionSwitch extends Component {
-
-    state = {
-        fixMatchHidden: true, unmatchedHidden: true, deleteHidden: true, mediaItemHidden: false,
-        source: searchSourceOptions[0].value
-    };
-
-    onFixMatchHide = () => {
-        this.setState({fixMatchHidden: true})
-    };
-
-    onFixMatchShow = () => {
-        this.setState({fixMatchHidden: false})
-    };
-
-    onUnmatchHide = () => {
-        this.setState({unmatchedHidden: true})
-    };
-
-    onUnmatchShow = () => {
-        this.setState({unmatchedHidden: false})
-    };
-
-    onDeleteHide = () => {
-        this.setState({deleteHidden: true})
-    };
-
-    onDeleteShow = () => {
-        this.setState({deleteHidden: false})
-    };
-
-    onMediaItemHide = () => {
-        this.setState({mediaItemHidden: true})
-    };
-
-    onMediaItemShow = () => {
-        this.setState({mediaItemHidden: false})
-    };
-
-    handleSearchSourceChange = (e, {value}) => {
-        this.setState({source: value})
-    };
-
-    handleResultSelect = (e, {result}) => {
-        // "/movies/:movie_id/media/:media_id/fixmatch/:source/:match_candidate_id"
-        let {media_id, movie_id} = this.props.match.params;
-        let to = encodeURI(`/movies/${movie_id}/media/${media_id}/fixmatch/${result.source}/${result.source_id}`);
-        this.props.history.push(to)
-    };
-
-    render() {
-
-        let s = this.state;
-
-        return (
-            <React.Fragment>
-                <Transition
-                    animation={"fade"}
-                    transitionOnMount={true}
-                    unmountOnHide={true}
-                    visible={this.props.action === 'fix_match' && s.unmatchedHidden && s.deleteHidden}
-                    onHide={this.onFixMatchHide}
-                    onShow={this.onFixMatchShow}
-                >
-                    <div className="ui three column grid">
-                        <div className="column"></div>
-
-                        <div className="column">
-                            <div className="ui center aligned basic segment">
-                                <div className="ui icon header"><i className="icon search"></i>
-                                    Find a movie or show on <Dropdown inline
-                                                                      defaultValue={searchSourceOptions[0].value}
-                                                                      options={searchSourceOptions}
-                                                                      onChange={this.handleSearchSourceChange}
-                                    /> to fix this match.
-                                </div>
-                                <MovieSearch
-                                    source={this.state.source}
-                                    onResultSelect={this.handleResultSelect}
-                                />
-                            </div>
-                            <div className="column"></div>
-                        </div>
-                    </div>
-                </Transition>
-                <Transition
-                    animation={"fade"}
-                    transitionOnMount={true}
-                    unmountOnHide={true}
-                    visible={this.props.action === 'unmatch' && s.fixMatchHidden && s.deleteHidden}
-                    onHide={this.onUnmatchHide}
-                    onShow={this.onUnmatchShow}
-                >
-                    <div className="ui basic segment">
-                        <h1>Unmatch</h1>
-                    </div>
-                </Transition>
-                <Transition
-                    animation={"fade"}
-                    transitionOnMount={true}
-                    unmountOnHide={true}
-                    visible={this.props.action === 'delete' && s.fixMatchHidden && s.unmatchedHidden}
-                    onHide={this.onDeleteHide}
-                    onShow={this.onDeleteShow}
-                >
-                    <div className="ui basic segment">
-                        <h1>Delete</h1>
-                    </div>
-                </Transition>
-                <Transition
-                    animation={"fade"}
-                    transitionOnMount={true}
-                    unmountOnHide={true}
-                    visible={this.props.action === 'media_item' && s.fixMatchHidden && s.unmatchedHidden}
-                    onHide={this.onDeleteHide}
-                    onShow={this.onDeleteShow}
-                >
-                    <div className="ui basic segment">
-                        <div className="ui horizontal divider">
-                            <i className="linkify icon"></i>
-                            <span/>Linked to
-                        </div>
-
-                        {this.props.ready &&
-
-                        <MediaItem
-
-                            title={this.props.title}
-                            plot={this.props.plot}
-                            poster={this.props.poster}
-                            year={this.props.release_year}
-
-                        >
-                        </MediaItem>
-                        }
-                        {!this.props.ready &&
-                        <MediaItemPlaceholder/>
-                        }
-                    </div>
-                </Transition>
-            </React.Fragment>
-        )
-    }
-}
-
 class MovieMediaFile extends Component {
 
     state = {
@@ -172,7 +27,8 @@ class MovieMediaFile extends Component {
         movie: {},
         loading: true,
         ready: false,
-        action: 'media_item'
+        action: 'media_item',
+        source: searchSourceOptions[0].value
     };
 
     componentDidMount = () => {
@@ -194,6 +50,13 @@ class MovieMediaFile extends Component {
         this.setState({
             action: action
         })
+    };
+
+    handleResultSelect = (e, {result}) => {
+        // "/movies/:movie_id/media/:media_id/fixmatch/:source/:match_candidate_id"
+        let {media_id, movie_id} = this.props.match.params;
+        let to = encodeURI(`/movies/${movie_id}/media/${media_id}/fixmatch/${result.source}/${result.source_id}`);
+        this.props.history.push(to)
     };
 
     render() {
@@ -265,15 +128,63 @@ class MovieMediaFile extends Component {
                         </div>
                     </div>
 
+                    <TransitionDeck activeCard={this.state.action}>
 
-                    <TransitionSwitch
-                        title={title}
-                        plot={movie.plot}
-                        year={movie.release_year}
-                        poster={movie.poster}
-                        ready={this.state.ready}
-                        action={this.state.action}
-                        {...this.props} />
+                        <TransitionDeck.Card name={"fix_match"}>
+                            <div className="ui three column grid">
+                                <div className="column"></div>
+
+                                <div className="column">
+                                    <div className="ui center aligned basic segment">
+                                        <div className="ui icon header"><i className="icon search"></i>
+                                            Find a movie or show on <Dropdown inline
+                                                                              defaultValue={searchSourceOptions[0].value}
+                                                                              options={searchSourceOptions}
+                                                                              onChange={this.handleSearchSourceChange}
+                                            /> to fix this match.
+                                        </div>
+                                        <MovieSearch
+                                            source={this.state.source}
+                                            onResultSelect={this.handleResultSelect}
+                                        />
+                                    </div>
+                                    <div className="column"></div>
+                                </div>
+                            </div>
+                        </TransitionDeck.Card>
+
+                        <TransitionDeck.Card name={"media_item"}>
+                            <div className="ui basic segment">
+                                <div className="ui horizontal divider">
+                                    <i className="linkify icon"></i>
+                                    <span/>Linked to
+                                </div>
+
+                                {this.state.ready &&
+
+                                <MediaItem
+                                    title={movie.title}
+                                    plot={movie.plot}
+                                    poster={movie.poster}
+                                    year={movie.release_year}
+
+                                >
+                                </MediaItem>
+                                }
+                                {!this.state.ready &&
+                                <MediaItemPlaceholder/>
+                                }
+                            </div>
+                        </TransitionDeck.Card>
+
+                        <TransitionDeck.Card name={"unmatch"}>
+                            <div><h1>unmatch</h1></div>
+                        </TransitionDeck.Card>
+
+                        <TransitionDeck.Card name={"delete"}>
+                            <div><h1>delete</h1></div>
+                        </TransitionDeck.Card>
+                    </TransitionDeck>
 
                 </div>
             )}>

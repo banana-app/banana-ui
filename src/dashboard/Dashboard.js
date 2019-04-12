@@ -90,7 +90,7 @@ const Dashboard = observer(
                         <h3 className="ui header">Recently added movies</h3>
                         <div className="ui six column grid">
                             {this.state.movies.map((m) =>
-                                <DashboardMediaItem poster={m.poster}
+                                <DashboardMediaItem key={m.id} poster={m.poster}
                                     title={formatTitle(m.title, m.release_year)}
                                     link_to={`/movies/${m.id}/${encodeURI(formatTitle(m.title, m.release_year))}`} />
                             )}

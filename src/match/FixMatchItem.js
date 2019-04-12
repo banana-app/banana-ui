@@ -4,11 +4,11 @@ import axios from 'axios'
 import Breadcrumb, {BreadcrumbItem} from '../Breadcrumb'
 import MediaFile from '../common/MediaFile'
 import MediaItem, {formatTitle, MediaItemPlaceholder} from '../common/MediaItem'
-import {Progress} from 'semantic-ui-react'
-import {when} from "mobx";
 import {observer} from 'mobx-react'
 import jobStore from '../common/JobsStore'
+import {MatchJobReactionHandler} from "./MatchJobReactionHandler";
 import _ from 'lodash'
+import Toasts from "../common/Toasts";
 
 /*
  "/movies/:movie_id/media/:media_id/fixmatch/:source/:match_candidate_id"
@@ -21,8 +21,7 @@ const FixMatchItem = observer(
             parsed_media_item: {},
             match_candidate: {},
             loading: true,
-            ready: false,
-            processing: false
+            ready: false
         };
 
 
@@ -42,8 +41,11 @@ const FixMatchItem = observer(
         };
 
         handleMatch = (e) => {
-            this.setState({loading: true, processing: true});
+            this.setState({loading: true});
             let p = this.props.match.params;
+            let media = this.state.parsed_media_item;
+
+            Toasts.info(`'${media.filename}' fix match submitted. It may take some time.`);
 
             axios.post(`/api/media/${p.media_id}`, {
                 match_type: p.source,
@@ -51,14 +53,20 @@ const FixMatchItem = observer(
                 match_type_id: p.match_candidate_id
             })
                 .then((result) => {
-
                     let job = result.data;
-                    when(
-                        () => _.some(jobStore.jobs, {event_type: "completed", job_id: job.job_id}),
-                        () => {
+                    let title = formatTitle(this.state.match_candidate.title, this.state.match_candidate.release_year);
+                    new MatchJobReactionHandler(
+                        jobStore,
+                        job,
+                        (data) => {
+                            Toasts.info(`'${media.filename}' linked to '${title}'.`);
                             this.props.history.push(`/movies?job_id=${job.job_id}`)
+                        },
+                        (data) => {
+                            Toasts.warning(_.first(data, {job_id: job.id}).context);
+                            this.setState({loading: false})
                         }
-                    )
+                    );
                 })
         };
 
@@ -76,6 +84,7 @@ const FixMatchItem = observer(
 
                     <div className="ui container">
 
+
                         <div className="top breadcrumb">
                             <Breadcrumb>
                                 <BreadcrumbItem to="/unmatched" name="Unmatched"/>
@@ -84,8 +93,8 @@ const FixMatchItem = observer(
                                                     this.state.match_candidate.release_year)} final/>
                             </Breadcrumb>
                         </div>
-                        <div class="ui basic segment">
-                            <div class="ui items">
+                        <div className="ui basic segment">
+                            <div className="ui items">
 
 
                                 <MediaFile
@@ -104,13 +113,8 @@ const FixMatchItem = observer(
                                     Will be linked to
                                 </div>
 
-
-                                <div className="basic segment">
                                 {this.state.ready &&
                                     <React.Fragment>
-                                    {this.state.processing &&
-                                    <Progress percent={100} attached='top' active/>
-                                    }
                                     <MediaItem
 
                                         title={pc.title}
@@ -122,7 +126,6 @@ const FixMatchItem = observer(
                                 {!this.state.ready &&
                                     <MediaItemPlaceholder/>
                                 }
-                                </div>
 
                                 <div className="ui large right floated buttons">
                                     <button

@@ -74,6 +74,7 @@ export class Poster extends Component {
             <React.Fragment>
                 <Img
                     src={`${this.props.poster}`}
+                    alt=""
                     container={children => {
                         return (
                             <Transition
@@ -86,8 +87,8 @@ export class Poster extends Component {
                             </Transition>
                         )
                     }}
-                    loader={<img src={placeholder} className="faded placeholder"/>}
-                    unloader={<img src={placeholder} className="faded placeholder"/>}
+                    loader={<img alt="movie poster" src={placeholder} className="faded placeholder"/>}
+                    unloader={<img alt="movie poster" src={placeholder} className="faded placeholder"/>}
                 />
             </React.Fragment>
         )
@@ -202,7 +203,9 @@ export const MediaItemPlaceholder = ({props}) => {
         <div className="item placeholder">
 
             <div className="ui tiny image">
-                <Poster poster={""}/>
+                <div className="ui tiny rounded image">
+                    <Poster poster=""/>
+                </div>
             </div>
 
             <div className="content">

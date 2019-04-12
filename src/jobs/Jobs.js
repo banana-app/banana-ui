@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Progress, Transition } from 'semantic-ui-react'
 import { observer } from 'mobx-react'
 import jobStore from '../common/JobsStore'
-import _ from 'lodash'
 
 export default observer(class Jobs extends Component {
 

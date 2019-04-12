@@ -87,7 +87,7 @@ class UnmatchedItem extends Component {
                                 <div className="column">
 
                                     <div className="ui center aligned basic segment">
-                                        <div className="ui icon header"><i class="icon search"></i>
+                                        <div className="ui icon header"><i className="icon search"></i>
                                             Search <Dropdown inline
                                                              defaultValue={searchSourceOptions[0].value}
                                                              options={searchSourceOptions}
@@ -104,7 +104,7 @@ class UnmatchedItem extends Component {
                                 <div className="column">
                                     <div className="ui relaxed divided items">
                                         <div className="ui basic center aligned segment">
-                                            <div className="ui icon header"><i class="icon magic"></i>Choose one,
+                                            <div className="ui icon header"><i className="icon magic"></i>Choose one,
                                                 we think You may like
                                             </div>
                                         </div>

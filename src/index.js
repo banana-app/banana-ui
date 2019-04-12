@@ -5,8 +5,8 @@ import Banana from './App';
 import * as serviceWorker from './serviceWorker';
 
 import './css/semantic.solar.min.css';
-//import 'https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css'
 import './css/banana.css'
+import './css/ReactToastify.min.css'
 
 ReactDOM.render(<Banana />, document.getElementById('root'));
 

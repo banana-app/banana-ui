@@ -84,11 +84,10 @@ class Ribbon extends Component {
         baseURL: `/`,
         headers: {'Cache-Control': 'no-cache'},
         adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter), {threshold: 5000})
-    })
+    });
 
 
     handleSearchChange = (e, {value}) => {
-        console.log("Search...")
         this.setState({isLoading: true, value: value, results: []})
         this.search.get(`/api/sources/local/search?title=${value}`)
             .then((movies) => {
@@ -108,7 +107,7 @@ class Ribbon extends Component {
                                 key: s.id,
                                 resolution: s.container,
                                 category: "media"
-                            }))]
+                            }))];
 
                         if (movies.data.total_results > 3 || media.data.total_results > 3)
                             aggregated.push(
@@ -157,7 +156,7 @@ class Ribbon extends Component {
 
                         <div className="ui text menu">
                             <NavLink to='/movies'>
-                                <img src="/img/banana.png" className="ui right spaced image mini"/>
+                                <img src="/img/banana.png" alt="" className="ui right spaced image mini"/>
                             </NavLink>
 
                             <Search

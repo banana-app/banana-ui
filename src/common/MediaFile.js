@@ -4,7 +4,9 @@ import * as PropTypes from "prop-types";
 export const Folder = (props) => {
     return (
         <React.Fragment>
-            <i className="icon folder"></i>{props.path}
+            {props.path &&
+            <><i className="icon folder"></i>{props.path}</>
+            }
         </React.Fragment>
     )
 };
