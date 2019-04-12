@@ -62,18 +62,26 @@ const Dashboard = observer(
                 )
         };
 
-        refereshRecentlyAdded = reaction(
-            () => jobsStore.activeJobs.map((j) => j.timestamp),
-            (data) => {
-                this.fetchMostRecentlyAdded()
-            }
-        );
+        refreshReaction = null
 
         state = { movies: [], total_items: 0 }
 
         componentDidMount = () => {
+            this.refereshRecentlyAdded = reaction(
+                () => jobsStore.activeJobs.map((j) => j.timestamp),
+                (data, reaction) => {
+                    this.fetchMostRecentlyAdded()
+                    this.refreshReaction = reaction
+                }
+            );
             this.fetchMostRecentlyAdded()
         };
+
+        componentWillUnmount() {
+            if (this.refreshReaction !== null)
+                this.refreshReaction.dispose()
+        }
+
 
         render() {
 

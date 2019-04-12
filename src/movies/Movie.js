@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import {NavLink} from 'react-router-dom'
+import {withRouter} from "react-router";
 import {Transition} from 'semantic-ui-react'
 import {RatingLabel, formatTitle, GenreLabel, SourceLabel, Poster} from '../common/MediaItem'
 import {QualityLabel, ResolutionLabel} from '../common/MediaFile'
@@ -143,133 +144,144 @@ export const CastItem = (props) => {
     )
 };
 
-class Movie extends Component {
+const Movie = withRouter(class Movie extends Component {
 
-    state = {movie: {genres: [{name: "foo"}], media_items: []}, cast: []}
+        state = {movie: {genres: [{name: "foo"}], media_items: []}, cast: []}
 
-    componentDidMount = () => {
-        axios.get(`/api/movies/${this.props.match.params.movie_id}`)
-            .then(result => {
-                this.setState({movie: result.data})
-                axios.get(`/api/movies/${result.data.external_id}/cast`)
-                    .then(result => {
-                        this.setState({cast: result.data})
-                    })
-                    .catch(error => {
-                        Toasts.error(error.message);
-                    })
+        refreshState = () => {
+            axios.get(`/api/movies/${this.props.match.params.movie_id}`)
+                .then(result => {
+                    this.setState({movie: result.data})
+                    axios.get(`/api/movies/${result.data.external_id}/cast`)
+                        .then(result => {
+                            this.setState({cast: result.data})
+                        })
+                        .catch(error => {
+                            Toasts.error(error.message);
+                        })
 
-            })
-    };
+                })
+        };
+
+
+        componentDidMount = () => {
+            this.refreshState()
+        };
+
+        componentDidUpdate(prevProps, prevState, snapshot) {
+            if (prevProps.location.pathname !== this.props.location.pathname) {
+                this.refreshState()
+            }
+        }
 
     render() {
 
-        let movie = this.state.movie;
-        let title = formatTitle(movie.title, movie.release_year);
+            let movie = this.state.movie;
+            let title = formatTitle(movie.title, movie.release_year);
 
-        return (
+            return (
 
-            <div className="ui container">
-                <div className="top breadcrumb">
-                    <Breadcrumb>
-                        <BreadcrumbItem to="/movies" name="Movies"/>
-                        <BreadcrumbItem
-                            to={`/movies/${this.props.match.params.movie_id}/${encodeURI(title)}`}
-                            name={title}
-                            final/>
-                    </Breadcrumb>
-                </div>
-                <div className="ui relaxed divided items">
-                    <div className="item">
+                <div key={this.props.location.pathname} className="ui container">
+                    <div className="top breadcrumb">
+                        <Breadcrumb>
+                            <BreadcrumbItem to="/movies" name="Movies"/>
+                            <BreadcrumbItem
+                                to={`/movies/${this.props.match.params.movie_id}/${encodeURI(title)}`}
+                                name={title}
+                                final/>
+                        </Breadcrumb>
+                    </div>
+                    <div className="ui relaxed divided items">
+                        <div className="item">
 
-                        <div className="ui fluid medium image">
-                            <Poster poster={movie.poster}/>
-                        </div>
+                            <div className="ui fluid medium image">
+                                <Poster poster={movie.poster}/>
+                            </div>
 
+                            <Transition
+                                transitionOnMount={true}
+                                animation="fade"
+                                duration="500"
+                            >
+                                <div className="ui content">
 
-                        <Transition
-                            transitionOnMount={true}
-                            animation="fade"
-                            duration="500"
-                        >
-                            <div className="ui content">
-
-                                <div className="header">
-                                    <div className="ui medium header">{title}</div>
-                                </div>
-
-                                <div className="meta">
-                                    {!_.eq(movie.title, movie.original_title) &&
-                                    <div className="ui small header">
-                                        {formatTitle(movie.original_title, movie.release_year)}
+                                    <div className="header">
+                                        <div className="ui medium header">{title}</div>
                                     </div>
-                                    }
-                                    <SourceLabel source={movie.source}/>
-                                    <RatingLabel rating={movie.rating}/>
-                                    {movie.genres.map(g =>
-                                        <GenreLabel key={g.id} genre={g.name}/>
-                                    )}
-                                </div>
 
-                                <div className="ui basic vertical segment">
-                                    <div className="description">
-                                        <div className="ui small header">{this.state.movie.plot}</div>
-                                    </div>
-                                </div>
-
-                                {this.state.cast.length > 0 &&
-                                <div className="ui basic vertical segment">
-                                    <h4>Cast</h4>
-                                    <div className="ui horizontal list">
-                                        {this.state.cast.map(c =>
-                                            <CastItem key={c.id}
-                                                      name={c.name}
-                                                      profile_picture={c.profile_picture}
-                                                      character={c.character}/>
+                                    <div className="meta">
+                                        {!_.eq(movie.title, movie.original_title) &&
+                                        <div className="ui small header">
+                                            {formatTitle(movie.original_title, movie.release_year)}
+                                        </div>
+                                        }
+                                        <SourceLabel source={movie.source}/>
+                                        <RatingLabel rating={movie.rating}/>
+                                        {movie.genres.map(g =>
+                                            <GenreLabel key={g.id} genre={g.name}/>
                                         )}
                                     </div>
+
+                                    <div className="ui basic vertical segment">
+                                        <div className="description">
+                                            <div className="ui small header">{this.state.movie.plot}</div>
+                                        </div>
+                                    </div>
+
+                                    {this.state.cast.length > 0 &&
+                                    <div className="ui basic vertical segment">
+                                        <h4>Cast</h4>
+                                        <div className="ui horizontal list">
+                                            {this.state.cast.map(c =>
+                                                <CastItem key={c.id}
+                                                          name={c.name}
+                                                          profile_picture={c.profile_picture}
+                                                          character={c.character}/>
+                                            )}
+                                        </div>
+                                    </div>
+                                    }
+
                                 </div>
-                                }
-
-                            </div>
-                        </Transition>
+                            </Transition>
+                        </div>
+                        {/* item */}
                     </div>
-                    {/* item */}
+                    {/* items */}
+
+                    { /* matched media items */}
+                    <table className="ui celled striped table">
+                        <thead>
+                        <tr>
+                            <th colSpan="2">Files</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {movie.media_items.map(media =>
+                            <MatchedMedia
+                                name={media.filename}
+                                target_name={media.target_filename}
+                                key={media.id}
+                                directory={media.path}
+                                target_directory={media.target_path}
+                                quality={media.quality}
+                                resolution={media.resolution}
+                                created_datetime={media.created_datetime}
+                                link_to={`/movies/${movie.id}/media/${media.id}`}
+                            />
+                        )}
+
+                        </tbody>
+                    </table>
+                    { /* matched media items */}
+
                 </div>
-                {/* items */}
+            );
+        }
 
-                { /* matched media items */}
-                <table className="ui celled striped table">
-                    <thead>
-                    <tr>
-                        <th colSpan="2">Files</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-
-                    {movie.media_items.map(media =>
-                        <MatchedMedia
-                            name={media.filename}
-                            target_name={media.target_filename}
-                            key={media.id}
-                            directory={media.path}
-                            target_directory={media.target_path}
-                            quality={media.quality}
-                            resolution={media.resolution}
-                            created_datetime={media.created_datetime}
-                            link_to={`/movies/${movie.id}/media/${media.id}`}
-                        />
-                    )}
-
-                    </tbody>
-                </table>
-                { /* matched media items */}
-
-            </div>
-        );
     }
-
-}
+);
 
 
 export default Movie
