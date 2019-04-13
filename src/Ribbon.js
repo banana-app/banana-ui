@@ -147,7 +147,7 @@ class Ribbon extends Component {
                         </div>
 
                         <div className="ui right floated text menu">
-                            <NavLink to='/jobs' className="icon item">
+                            <NavLink to='/dashboard/jobs' className="icon item">
                                 <JobIndicator jobStore={jobStore}/>
 
                                 {/*<div class="floating ui circular mini yellow label">2</div>*/}

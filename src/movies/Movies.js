@@ -4,21 +4,49 @@ import Breadcrumb, {BreadcrumbItem} from '../Breadcrumb'
 import {Dropdown, Pagination} from 'semantic-ui-react'
 import axios from 'axios'
 import _ from 'lodash'
+import PropTypes from "prop-types";
 
 const sortOptions = [
-    {"text": 'Date added', "value": 'dateAddedDesc', icon: 'long arrow alternate up'},
-    {"text": 'Date added', "value": 'dateAddedAsc', icon: 'arrow down'},
-    {"text": 'By title', "value": 'titleDesc', icon: 'arrow down'},
-    {"text": 'By title', "value": 'titleAsc', icon: 'arrow up'},
+    {text: 'Time added', value: 'created_datetime.desc', icon: 'sort amount up'},
+    {text: 'Time added', value: 'created_datetime.asc', icon: 'sort amount down'},
+    {text: 'Title', value: 'title.desc', icon: 'sort alphabet up'},
+    {text: 'Title', value: 'title.asc', icon: 'sort alphabet down'},
 ];
 
-export const MoviesContext = React.createContext("movies")
+const sortIcon = {
+    'created_datetime.desc' : 'icon sort amount up',
+    'created_datetime.asc' : 'icon sort amount down',
+    'title.desc' : 'icon sort alphabet up',
+    'title.asc' : 'icon sort alphabet down'
+};
+
+const DropdownTrigger = (props) => {
+    return (<><i className={props.icon}></i>{props.name}</>)
+};
+
+DropdownTrigger.propTypes = {
+    icon: PropTypes.string,
+    name: PropTypes.string
+};
+
+const sortTextFromValue = (value) => _.find(sortOptions, (o) => o.value === value).text;
+
+const sortSpec = (value) => {
+    let [ order_by, order_direction ] = value.split('.');
+    return `order_by=${order_by}&order_direction=${order_direction}`;
+};
 
 class Movies extends Component {
 
-    state = {movies: [], total_items: 0, page: 1, pages: 1}
+    moviesPerPage = 5;
 
-    moviesPerPage = 5
+    state = {
+        movies: [],
+        total_items: 0,
+        page: 1,
+        pages: 1,
+        sortOrder: sortOptions[0].value
+    };
 
     initComponentWithPlaceholders = () => {
         let placeholderMovies = [];
@@ -27,13 +55,13 @@ class Movies extends Component {
         this.setState({movies: placeholderMovies})
     };
 
-    componentDidMount = () => {
-        this.initComponentWithPlaceholders();
+    refereshState = () => {
         let qp = new URLSearchParams(this.props.location.search);
         let searchURL = `/api/movies?page=${this.state.page}`;
         let job_id = qp.get('job_id');
         if (!_.isNull(job_id))
-            searchURL += `&job_id=${job_id}`
+            searchURL += `&job_id=${job_id}`;
+        searchURL += `&${sortSpec(this.state.sortOrder)}`;
         axios.get(searchURL)
             .then(result =>
                 this.setState({
@@ -44,10 +72,14 @@ class Movies extends Component {
             )
     };
 
+    componentDidMount = () => {
+        this.initComponentWithPlaceholders();
+        this.refereshState()
+    };
 
     handlePageChange = (e, {activePage}) => {
         this.initComponentWithPlaceholders()
-        axios.get(`/api/movies?page=${activePage}`)
+        axios.get(`/api/movies?page=${activePage}&${sortSpec(this.state.sortOrder)}`)
             .then(result =>
                 this.setState({
                     movies: result.data.items,
@@ -56,7 +88,13 @@ class Movies extends Component {
                     pages: result.data.pages
                 })
             )
-    }
+    };
+
+    handleSortOrderChange = (e, { value }) => {
+        this.setState({ sortOrder: value }, () => {
+            this.refereshState()
+        });
+    };
 
     movieMediaItem = (m) => {
         return (
@@ -92,7 +130,12 @@ class Movies extends Component {
                         <BreadcrumbItem to="/movies" name="Movies" final/>
                     </Breadcrumb>
                     <div className="ui right floated text menu">
-                        <Dropdown defaultValue={sortOptions[0].value} options={sortOptions}/>
+                        <Dropdown defaultValue={sortOptions[0].value}
+                                  options={sortOptions}
+                                  trigger={<DropdownTrigger name={sortTextFromValue(this.state.sortOrder)} icon={sortIcon[this.state.sortOrder]} />}
+                                  onChange={this.handleSortOrderChange}
+                        />
+
                     </div>
                 </div>
                 {this.state.movies.map(m =>
@@ -112,12 +155,11 @@ class Movies extends Component {
                         boundaryRange="0"
                     />
                     }
-                    <MoviesContext.Provider value={this.state.total_items}/>
+
                 </div>
             </div>
         )
     }
-
 }
 
 export default Movies;

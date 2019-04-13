@@ -107,7 +107,7 @@ class MovieMediaFile extends Component {
                                     <Menu borderless tabular className='top attached basic text'
                                     >
 
-                                        <Dropdown icon='cog'>
+                                        <Dropdown trigger={<><i className={"icon cog"}></i></>}>
                                             <Dropdown.Menu>
                                                 <Dropdown.Item
                                                     onClick={(e, data) => this.handleMenuItemSelect('fix_match')}>

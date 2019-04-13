@@ -9,6 +9,8 @@ import {observer} from "mobx-react";
 import {when} from "mobx"
 import jobStore, { JobContext } from "../common/JobsStore"
 import _ from 'lodash'
+import {MatchJobReactionHandler} from "./MatchJobReactionHandler";
+import Toasts from "../common/Toasts";
 
 const MatchItem = observer(
     class MatchItem extends Component {
@@ -38,6 +40,9 @@ const MatchItem = observer(
         handleMatch = (e) => {
             this.setState({loading: true, processing: true});
             let p = this.props.match.params;
+            let media = this.state.parsed_media_item;
+
+            Toasts.info(`'${media.filename}' match submitted. It may take some time.`);
 
             axios.post("/api/movies", {
                 match_type: p.source,
@@ -46,13 +51,20 @@ const MatchItem = observer(
             })
                 .then((result) => {
                     let job = result.data;
-                    when(
-                        () => _.some(jobStore.jobs, {event_type: JobContext.COMPLETED, job_id: job.job_id}),
-                        () => {
+                    let title = formatTitle(this.state.match_candidate.title, this.state.match_candidate.release_year);
+                    new MatchJobReactionHandler(
+                        jobStore,
+                        job,
+                        (data) => {
+                            Toasts.info(`'${media.filename}' linked to '${title}'.`);
                             this.props.history.push(`/movies?job_id=${job.job_id}`)
+                        },
+                        (data) => {
+                            Toasts.warning(_.first(data, {job_id: job.id}).context);
+                            this.setState({loading: false})
                         }
-                    )}
-                )
+                    );
+                })
         };
 
         handleCancel = (e) => {
@@ -101,12 +113,8 @@ const MatchItem = observer(
                                 </div>
 
 
-                                <div className="basic segment">
                                     {this.state.ready &&
                                     <React.Fragment>
-                                        {this.state.processing &&
-                                        <Progress percent={100} attached='top' active/>
-                                        }
                                         <MediaItem
 
                                             title={pc.title}
@@ -118,8 +126,6 @@ const MatchItem = observer(
                                     {!this.state.ready &&
                                     <MediaItemPlaceholder/>
                                     }
-                                </div>
-
 
                                 <div className="ui large right floated buttons">
                                     <button

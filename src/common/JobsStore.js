@@ -4,29 +4,40 @@ import _ from 'lodash'
 
 const socket = io(`http://localhost:3000/jobs`);
 
-socket.on("media_scanner", (data) => {
+
+class JobType {
+    static MEDIA_SCANNER = 'media_scanner'
+    static MANUAL_MATCH = 'manual_match'
+    static FIX_MATCH = 'fix_match'
+}
+
+
+socket.on(JobType.MEDIA_SCANNER, (data) => {
     let event = JSON.parse(data);
     jobStore.events[event.job_id] = new JobContext(event.job_id, event.job_type, event.event_type,
         event.current_item, event.total_items, event.context)
 });
 
-socket.on("manual_match", (data) => {
+socket.on(JobType.MANUAL_MATCH, (data) => {
     let event = JSON.parse(data);
     console.log(event);
     jobStore.events[event.job_id] = new JobContext(event.job_id, event.job_type, event.event_type,
         event.current_item, event.total_items, event.context)
 });
 
+socket.on(JobType.FIX_MATCH, (data) => {
+    let event = JSON.parse(data);
+    console.log(event);
+    jobStore.events[event.job_id] = new JobContext(event.job_id, event.job_type, event.event_type,
+        event.current_item, event.total_items, event.context)
+});
+
+
+
 class EventType {
     static COMPLETED = 'completed';
     static ERROR = 'error';
     static PROGRESS = 'progress';
-}
-
-class JobType {
-    static MEDIA_SCANNER = 'media_scanner'
-    static MANUAL_MACTH = 'manual_match'
-    static FIX_MATCH = 'fix_match'
 }
 
 export class JobContext {

@@ -5,10 +5,11 @@ import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb'
 import _ from 'lodash'
 import {formatTitle, Poster} from '../common/MediaItem'
 import axios from 'axios'
-import { Transition } from 'semantic-ui-react'
+import {Transition} from 'semantic-ui-react'
 import jobsStore from '../common/JobsStore'
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import {JobProgress} from "../jobs/Jobs";
 
 
 class DashboardMediaItem extends Component {
@@ -52,8 +53,10 @@ const Dashboard = observer(
 
     class Dashboard extends Component {
 
+        recentlyAddedItems = 6;
+
         fetchMostRecentlyAdded = () => {
-            axios.get(`/api/movies?page=1&order_by=created_datetime&order_direction=desc`)
+            axios.get(`/api/movies?page=1&page_size=${this.recentlyAddedItems}&order_by=created_datetime&order_direction=desc`)
                 .then(result =>
                     this.setState({
                         movies: _.take(result.data.items, 6),
@@ -82,7 +85,6 @@ const Dashboard = observer(
                 this.refreshReaction.dispose()
         }
 
-
         render() {
 
             return (
@@ -95,7 +97,7 @@ const Dashboard = observer(
                     </div>
 
                     <div className="ui basic segment">
-                        <h3 className="ui header">Recently added movies</h3>
+                       <h3 className="ui header"> <NavLink to="/movies">Recently added movies</NavLink></h3>
                         <div className="ui six column grid">
                             {this.state.movies.map((m) =>
                                 <DashboardMediaItem key={m.id} poster={m.poster}
@@ -103,6 +105,19 @@ const Dashboard = observer(
                                     link_to={`/movies/${m.id}/${encodeURI(formatTitle(m.title, m.release_year))}`} />
                             )}
                         </div>
+                    </div>
+                    {/* Recently added movies */}
+
+                    <div className="ui basic segment">
+                        <h3 className="ui header"><NavLink to="/dashboard/jobs">Active tasks</NavLink></h3>
+                        <Transition.Group
+                            animation={"fade down"}
+                        >
+                            {jobsStore.activeJobs.map((j) =>
+                                <JobProgress value={j.current_item} total={j.total_items} type={j.job_type}/>
+                            )}
+
+                        </Transition.Group>
                     </div>
                     {/* Recently added movies */}
 

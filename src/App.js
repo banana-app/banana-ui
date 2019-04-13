@@ -38,7 +38,7 @@ class Banana extends Component {
                                 <Toasts/>
 
                                 <Route exact path='/dashboard' component={Dashboard}/>
-                                <Route exact path='/jobs' component={Jobs}/>
+                                <Route exact path='/dashboard/jobs' component={Jobs}/>
                                 <Route exact path="/unmatched" component={Unmatched}/>
                                 <Route exact path="/unmatched/:id/:item/match/:source/:match_candidate_id"
                                        component={MatchItem}/>
