@@ -54,7 +54,7 @@ export const SourceLabel = (props) => {
     return (<React.Fragment>
         {isSet(props.source) &&
         <div className="ui mini label">
-            <i className="map pin icon"></i>
+            <i className="map marker alternate icon"></i>
             <div className="detail">{props.source}</div>
         </div>
         }

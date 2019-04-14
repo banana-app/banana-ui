@@ -28,6 +28,18 @@ export const QualityLabel = (props) => {
     </React.Fragment>)
 };
 
+
+export const IgnoredLabel = (props) => {
+    return (<React.Fragment >
+        {props.ignored &&
+            <div className="ui mini orange label">
+                <i className="eye slash icon"></i>
+                <div className="detail">Ignored</div>
+            </div>
+        }
+    </React.Fragment>)
+};
+
 export const TitleLabel = (props) => {
 
     return (<React.Fragment>

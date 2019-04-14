@@ -7,10 +7,10 @@ import _ from 'lodash'
 import PropTypes from "prop-types";
 
 const sortOptions = [
-    {text: 'Time added', value: 'created_datetime.desc', icon: 'sort amount up'},
-    {text: 'Time added', value: 'created_datetime.asc', icon: 'sort amount down'},
-    {text: 'Title', value: 'title.desc', icon: 'sort alphabet up'},
-    {text: 'Title', value: 'title.asc', icon: 'sort alphabet down'},
+    {text: 'Time added ', value: 'created_datetime.desc', icon: 'sort amount up'},
+    {text: 'Time added ', value: 'created_datetime.asc', icon: 'sort amount down'},
+    {text: 'Title ', value: 'title.desc', icon: 'sort alphabet up'},
+    {text: 'Title ', value: 'title.asc', icon: 'sort alphabet down'},
 ];
 
 const sortIcon = {
@@ -55,7 +55,7 @@ class Movies extends Component {
         this.setState({movies: placeholderMovies})
     };
 
-    refereshState = () => {
+    refreshState = () => {
         let qp = new URLSearchParams(this.props.location.search);
         let searchURL = `/api/movies?page=${this.state.page}`;
         let job_id = qp.get('job_id');
@@ -74,7 +74,7 @@ class Movies extends Component {
 
     componentDidMount = () => {
         this.initComponentWithPlaceholders();
-        this.refereshState()
+        this.refreshState()
     };
 
     handlePageChange = (e, {activePage}) => {
@@ -92,7 +92,7 @@ class Movies extends Component {
 
     handleSortOrderChange = (e, { value }) => {
         this.setState({ sortOrder: value }, () => {
-            this.refereshState()
+            this.refreshState()
         });
     };
 

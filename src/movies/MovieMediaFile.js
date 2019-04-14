@@ -16,8 +16,8 @@ import TransitionDeck from "./TransitionDeck";
 
 
 const searchSourceOptions = [
-    {"text": 'TMDb', "value": 'tmdb'},
-    {"text": 'IMDb', "value": 'imdb'},
+    {"text": 'TMDb ', "value": 'tmdb'},
+    {"text": 'IMDb ', "value": 'imdb'},
 ];
 
 class MovieMediaFile extends Component {
@@ -111,14 +111,14 @@ class MovieMediaFile extends Component {
                                             <Dropdown.Menu>
                                                 <Dropdown.Item
                                                     onClick={(e, data) => this.handleMenuItemSelect('fix_match')}>
-                                                    <i className={'icon clone'}></i>Fix match</Dropdown.Item>
+                                                    <i className={'icon clone'}></i>Fix match </Dropdown.Item>
 
                                                 <Dropdown.Item
                                                     onClick={(e, data) => this.handleMenuItemSelect('unmatch')}>
-                                                    <i className={'icon unlink'}></i> Unmatch</Dropdown.Item>
+                                                    <i className={'icon unlink'}></i>Unmatch </Dropdown.Item>
                                                 <Dropdown.Item
                                                     onClick={(e, data) => this.handleMenuItemSelect('delete')}>
-                                                    <i className={'icon delete'}></i>Delete</Dropdown.Item>
+                                                    <i className={'icon delete'}></i>Delete </Dropdown.Item>
                                             </Dropdown.Menu>
                                         </Dropdown>
 

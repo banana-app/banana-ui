@@ -9,8 +9,8 @@ import MovieSearch from "../movies/MovieSearch";
 
 
 const searchSourceOptions = [
-    { "text": 'TMDb', "value": 'tmdb' },
-    { "text": 'IMDb', "value": 'imdb' },
+    { "text": 'TMDb ', "value": 'tmdb' },
+    { "text": 'IMDb ', "value": 'imdb' },
 ];
 
 class UnmatchedItem extends Component {
@@ -121,7 +121,7 @@ class UnmatchedItem extends Component {
                                             >
 
                                                 <SourceLabel source={m.source}/>
-                                                {m.genres.map(g =>
+                                                {m.genres.slice(0,3).map(g =>
                                                     <GenreLabel key={g.id} genre={g.name}/>
                                                 )}
                                             </MediaItem>

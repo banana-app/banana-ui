@@ -31,11 +31,32 @@
     opacity: 0.03 !important;
 }
 
+.ui.dropdown > .dropdown.icon {
+    margin: 0 0 0 0.1em !important;
+}
+
+
+th.dropdown.header.cell {
+    overflow: unset !important;
+    cursor: unset !important;
+    width: 50px !important;
+}
+
+th.dropdown.header.cell:hover {
+    background-color: rgb(0, 63, 80) !important;
+}
+
+.ui.dropdown .menu > .divider {
+    border-top: 1px solid rgba(34,36,38,0.4);
+    height: 0;
+    margin: .5em 0;
+}
+
 .faded.placeholder {
 }
 
 .top.breadcrumb {
-    margin-top: 6px;
+    margin-top: 8px;
 }
 
 .ui.compact.list {

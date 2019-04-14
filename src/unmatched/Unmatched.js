@@ -3,65 +3,141 @@ import React, {Component} from 'react';
 import {NavLink} from 'react-router-dom';
 import Breadcrumb, {BreadcrumbItem} from '../Breadcrumb';
 import axios from 'axios';
-import {Pagination} from 'semantic-ui-react';
-import {QualityLabel, ResolutionLabel} from '../common/MediaFile'
+import {Checkbox, Dropdown, Pagination, Table} from 'semantic-ui-react';
+import {IgnoredLabel, QualityLabel, ResolutionLabel} from '../common/MediaFile'
 import moment from 'moment'
+import _ from 'lodash'
+import Toasts from "../common/Toasts";
 
 export class UnmatchedItem extends Component {
     render() {
-        return (<tr>
-            <td>
+        return (<Table.Row>
+            <Table.Cell collapsing textAlign={'center'}>
+                <Checkbox checked={this.props.selected} onClick={() => this.props.onSelectItem(this.props.id)} />
+            </Table.Cell>
+            <Table.Cell selectable>
+                <NavLink to={`/unmatched/${this.props.id}/${this.props.name}`}>
                 <div className="ui list">
                     <div className="item">
                         <div className="header"><i className="file video outline icon"></i>
-                            <NavLink to={`/unmatched/${this.props.id}/${this.props.name}`}>{this.props.name}</NavLink>
-                            <span/>
+                            {this.props.name}
+                            &nbsp;
                             <ResolutionLabel resolution={this.props.resolution}/>
                             <QualityLabel quality={this.props.quality}/>
+                            <IgnoredLabel ignored={this.props.ignored}/>
                         </div>
                         <div className="description"><i className="folder icon"></i>{this.props.directory}</div>
                     </div>
                 </div>
-            </td>
-            <td className="right aligned">
+                </NavLink>
+            </Table.Cell>
+            <Table.Cell className={"right aligned"}>
                 {moment(this.props.created_datetime).fromNow()}
-            </td>
-        </tr>);
+            </Table.Cell>
+        </Table.Row>);
     }
 }
 
+const order_map = {
+    'descending': 'desc',
+    'ascending': 'asc'
+};
+
 class Unmatched extends Component {
 
-    state = {items: [], page: 1, pages: 1, total_items: 0}
+    static PAGE_SIZE = 10;
 
+    state = {
+        items: [],
+        page: 1,
+        pages: 1,
+        total_items: 0,
+        order_by: 'created_datetime',
+        order_direction: 'ascending'
+    };
 
-    handlePageChange = (e, {activePage}) => {
-        axios.get(`/api/unmatched?page=${activePage}`)
+    refreshState = (page) => {
+        let activePage = _.isUndefined(page) ? this.state.page : page;
+        let { order_by, order_direction } = this.state;
+        axios.get(`/api/unmatched?page=${activePage}&order_by=${order_by}&order_direction=${order_map[order_direction]}&include_ignored`)
             .then((result) => {
+                let media = result.data.items.map(i =>
+                    ({
+                        ...i,
+                        selected: false
+                    })
+                );
                 this.setState({
-                    items: result.data.items,
+                    items: media,
                     page: activePage,
                     pages: result.data.pages,
-                    total_items: result.data.total_items
+                    total_items: result.data.total_items,
                 })
-            })
-    }
+            }).catch((cause) => Toasts.error(cause.toString())) ;
+    };
+
+    handlePageChange = (e, {activePage}) => {
+        this.refreshState(activePage)
+    };
 
     componentDidMount = () => {
-        axios.get(`/api/unmatched?page=${this.state.page}`)
+        this.refreshState()
+    };
+
+    handleSort = (sortColumn) => {
+        const {order_by, order_direction} = this.state;
+
+        if (order_by !== sortColumn) {
+            this.setState({
+                order_by: sortColumn,
+                order_direction: 'ascending',
+            }, () => this.refreshState());
+        } else {
+            this.setState({
+                order_direction: order_direction === 'ascending' ? 'descending' : 'ascending',
+            }, () => this.refreshState())
+        }
+    };
+
+    handleSelectAll = () => {
+        let items = _.merge({}, this.state).items;
+        _.forEach(items, i => i.selected = true);
+        this.setState({items: items})
+    };
+
+    handleToggleSelect = (id) => {
+        let items = _.merge({}, this.state).items;
+        let item = _.find(items, i => i.id === id);
+        console.log(item);
+        item.selected = !item.selected;
+        this.setState({items: items})
+    };
+
+    updateMedia = (data) => {
+        axios.put("/api/media", data)
             .then((result) => {
-                this.setState({
-                    items: result.data.items,
-                    pages: result.data.pages,
-                    total_items: result.data.total_items
-                })
-            })
-    }
+                this.refreshState()
+            }).catch((reason) => {
+            Toasts.error(reason.toString())
+        })
+    };
+
+    handleIgnoreSelected = () => {
+        let ignoredMedia = _.filter(this.state.items, {selected: true} ).map(m => ({ id: m.id, ignored: true}));
+        this.updateMedia(ignoredMedia)
+    };
+
+    handleUnIgnoreSelected = () => {
+        let unIgnoredMedia = _.filter(this.state.items, {selected: true} ).map(m => ({ id: m.id, ignored: false}));
+        this.updateMedia(unIgnoredMedia)
+    };
+
 
     render() {
 
-        return (
+        let {order_by, order_direction } = this.state;
 
+        return (
 
             <div className="ui container">
                 <div className="top breadcrumb">
@@ -69,13 +145,44 @@ class Unmatched extends Component {
                         <BreadcrumbItem to="/unmatched" name="Unmatched" final/>
                     </Breadcrumb>
                 </div>
-                <table className="ui celled striped table">
-                    <thead>
-                    <tr>
-                        <th colSpan="2">Files</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                <Table sortable celled fixed>
+                    <Table.Header>
+                    <Table.Row>
+                        <Table.HeaderCell selectable={false} className="dropdown header cell">
+                            <Dropdown trigger={<><i className={"icon cog"}></i></>} >
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={() => this.handleSelectAll()}>
+                                        <i className={"icon check square outline"}></i> Select all
+                                    </Dropdown.Item>
+                                    <Dropdown.Divider/>
+                                    <Dropdown.Item onClick={() => this.handleIgnoreSelected()}>
+                                        <i className={"icon eye slash"}></i> Ignore selected
+                                    </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => this.handleUnIgnoreSelected()}>
+                                        <i className={"icon eye slash"}></i> Un-ignore selected
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+
+                        </Table.HeaderCell>
+
+                        <Table.HeaderCell
+                            sorted={order_by  === 'filename'? order_direction : null}
+                            onClick={() => this.handleSort('filename')}
+                            className={"twelve wide"}
+                        >
+                            Media
+                        </Table.HeaderCell>
+
+                        <Table.HeaderCell
+                            sorted={order_by  === 'created_datetime'? order_direction : null}
+                            onClick={() => this.handleSort('created_datetime')}
+                        >
+                            Time added
+                        </Table.HeaderCell>
+                    </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
 
                     {this.state.items.map(i =>
                         <UnmatchedItem
@@ -85,16 +192,20 @@ class Unmatched extends Component {
                             directory={i.parsed_media_item.path}
                             quality={i.parsed_media_item.quality}
                             resolution={i.parsed_media_item.resolution}
-                            created_datetime={i.created_datetime}/>
+                            created_datetime={i.created_datetime}
+                            selected={i.selected}
+                            ignored={i.parsed_media_item.ignored}
+                            onSelectItem={(id) => this.handleToggleSelect(id)}
+                        />
                     )}
 
-                    </tbody>
+                    </Table.Body>
 
                     {/* pagination */}
                     {this.state.pages > 1 &&
-                    <tfoot>
-                    <tr>
-                        <th colSpan="5">
+                    <Table.Footer>
+                    <Table.Row>
+                        <Table.HeaderCell colSpan="3">
 
                             <div className="ui right floated pagination menu">
                                 <Pagination
@@ -107,18 +218,19 @@ class Unmatched extends Component {
                                     boundaryRange="0"
                                     onPageChange={this.handlePageChange}/>
                             </div>
-                        </th>
-                    </tr>
-                    </tfoot>
+                        </Table.HeaderCell>
+                    </Table.Row>
+                    </Table.Footer>
                     }
                     {/* pagination */}
 
-                </table>
+                </Table>
             </div>
         )
 
 
     }
+
 }
 
 export default Unmatched;

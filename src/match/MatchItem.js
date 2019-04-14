@@ -4,9 +4,7 @@ import axios from 'axios'
 import Breadcrumb, {BreadcrumbItem} from '../Breadcrumb'
 import MediaFile from '../common/MediaFile'
 import MediaItem, {formatTitle, MediaItemPlaceholder} from '../common/MediaItem'
-import {Progress} from "semantic-ui-react";
 import {observer} from "mobx-react";
-import {when} from "mobx"
 import jobStore, { JobContext } from "../common/JobsStore"
 import _ from 'lodash'
 import {MatchJobReactionHandler} from "./MatchJobReactionHandler";
