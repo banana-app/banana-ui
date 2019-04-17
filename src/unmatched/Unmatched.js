@@ -8,6 +8,7 @@ import {IgnoredLabel, QualityLabel, ResolutionLabel} from '../common/MediaFile'
 import moment from 'moment'
 import _ from 'lodash'
 import Toasts from "../common/Toasts";
+import update from 'immutability-helper'
 
 export class UnmatchedItem extends Component {
     render() {
@@ -53,13 +54,14 @@ class Unmatched extends Component {
         pages: 1,
         total_items: 0,
         order_by: 'created_datetime',
-        order_direction: 'ascending'
+        order_direction: 'ascending',
+        include_ignored: false
     };
 
     refreshState = (page) => {
         let activePage = _.isUndefined(page) ? this.state.page : page;
         let { order_by, order_direction } = this.state;
-        axios.get(`/api/unmatched?page=${activePage}&order_by=${order_by}&order_direction=${order_map[order_direction]}&include_ignored`)
+        axios.get(`/api/unmatched?page=${activePage}&order_by=${order_by}&order_direction=${order_map[order_direction]}&${this.state.include_ignored?'include_ignored':''}`)
             .then((result) => {
                 let media = result.data.items.map(i =>
                     ({
@@ -122,20 +124,21 @@ class Unmatched extends Component {
         })
     };
 
-    handleIgnoreSelected = () => {
-        let ignoredMedia = _.filter(this.state.items, {selected: true} ).map(m => ({ id: m.id, ignored: true}));
+    handleIgnoreSelected = (ignore) => {
+        let ignoredMedia = _.filter(this.state.items, {selected: true} ).map(
+            (i) => update(i.parsed_media_item, { ignored: { $set: ignore} })
+        );
         this.updateMedia(ignoredMedia)
     };
 
-    handleUnIgnoreSelected = () => {
-        let unIgnoredMedia = _.filter(this.state.items, {selected: true} ).map(m => ({ id: m.id, ignored: false}));
-        this.updateMedia(unIgnoredMedia)
+    handleShowIgnored = () => {
+        this.setState({include_ignored: !this.state.include_ignored},
+            () => this.refreshState())
     };
-
 
     render() {
 
-        let {order_by, order_direction } = this.state;
+        let {order_by, order_direction, include_ignored } = this.state;
 
         return (
 
@@ -152,14 +155,19 @@ class Unmatched extends Component {
                             <Dropdown trigger={<><i className={"icon cog"}></i></>} >
                                 <Dropdown.Menu>
                                     <Dropdown.Item onClick={() => this.handleSelectAll()}>
-                                        <i className={"icon check square outline"}></i> Select all
+                                        <i className={"icon check square outline"}></i>Select all
                                     </Dropdown.Item>
                                     <Dropdown.Divider/>
-                                    <Dropdown.Item onClick={() => this.handleIgnoreSelected()}>
-                                        <i className={"icon eye slash"}></i> Ignore selected
+                                    <Dropdown.Item onClick={() => this.handleIgnoreSelected(true)}>
+                                        <i className={"icon eye slash"}></i>Ignore selected
                                     </Dropdown.Item>
-                                    <Dropdown.Item onClick={() => this.handleUnIgnoreSelected()}>
-                                        <i className={"icon eye slash"}></i> Un-ignore selected
+                                    <Dropdown.Item onClick={() => this.handleIgnoreSelected(false)}>
+                                        <i className={"icon eye"}></i>Un-ignore selected
+                                    </Dropdown.Item>
+                                    <Dropdown.Divider/>
+                                    <Dropdown.Item onClick={() => this.handleShowIgnored()}>
+                                        {include_ignored && <><i className={"icon filter"}></i>Hide ignored</>}
+                                        {!include_ignored && <><i className={"icon filter"}></i>Show ignored</>}
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
