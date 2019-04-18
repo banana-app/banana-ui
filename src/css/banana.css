@@ -52,6 +52,10 @@ th.dropdown.header.cell:hover {
     margin: .5em 0;
 }
 
+.ignored {
+    opacity: 0.35 !important;
+}
+
 .faded.placeholder {
 }
 

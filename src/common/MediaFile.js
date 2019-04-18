@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import * as PropTypes from "prop-types";
+import classNames from 'classnames'
 
 export const Folder = (props) => {
     return (
@@ -12,18 +13,34 @@ export const Folder = (props) => {
 };
 
 export const ResolutionLabel = (props) => {
+    let classes = classNames('ui',
+        'yellow',
+        'small',
+        'horizontal',
+        'label',
+        {'right': props.right,
+        'floated': props.floated}
+    );
     return (<React.Fragment >
         {props.resolution &&
-            <div className="ui yellow small horizontal label">{props.resolution}</div>
+            <div className={classes}>{props.resolution}</div>
         }
     </React.Fragment >)
 };
 
 
 export const QualityLabel = (props) => {
-    return (<React.Fragment >
+
+    let classes = classNames('ui',
+        'green',
+        'small',
+        'horizontal',
+        'label',
+        {'right': props.right, 'floated': props.floated});
+
+    return (<React.Fragment>
         {props.quality &&
-            <div className="ui green small horizontal label">{props.quality}</div>
+            <div className={classes}>{props.quality}</div>
         }
     </React.Fragment>)
 };

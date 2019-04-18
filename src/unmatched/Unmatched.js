@@ -4,28 +4,34 @@ import {NavLink} from 'react-router-dom';
 import Breadcrumb, {BreadcrumbItem} from '../Breadcrumb';
 import axios from 'axios';
 import {Checkbox, Dropdown, Pagination, Table} from 'semantic-ui-react';
-import {IgnoredLabel, QualityLabel, ResolutionLabel} from '../common/MediaFile'
+import {QualityLabel, ResolutionLabel} from '../common/MediaFile'
 import moment from 'moment'
 import _ from 'lodash'
 import Toasts from "../common/Toasts";
 import update from 'immutability-helper'
+import classNames from 'classnames'
 
 export class UnmatchedItem extends Component {
     render() {
+
+        let classes = classNames(
+            'ui', 'list', {'ignored': this.props.ignored }
+        );
+
+
         return (<Table.Row>
             <Table.Cell collapsing textAlign={'center'}>
                 <Checkbox checked={this.props.selected} onClick={() => this.props.onSelectItem(this.props.id)} />
             </Table.Cell>
             <Table.Cell selectable>
                 <NavLink to={`/unmatched/${this.props.id}/${this.props.name}`}>
-                <div className="ui list">
+                <div className={classes}>
                     <div className="item">
                         <div className="header"><i className="file video outline icon"></i>
                             {this.props.name}
                             &nbsp;
-                            <ResolutionLabel resolution={this.props.resolution}/>
-                            <QualityLabel quality={this.props.quality}/>
-                            <IgnoredLabel ignored={this.props.ignored}/>
+                            <ResolutionLabel resolution={this.props.resolution} right floated/>
+                            <QualityLabel quality={this.props.quality} right floated/>
                         </div>
                         <div className="description"><i className="folder icon"></i>{this.props.directory}</div>
                     </div>
@@ -33,7 +39,7 @@ export class UnmatchedItem extends Component {
                 </NavLink>
             </Table.Cell>
             <Table.Cell className={"right aligned"}>
-                {moment(this.props.created_datetime).fromNow()}
+                <div className={classNames({'ignored': this.props.ignored})}>{moment(this.props.created_datetime).fromNow()}</div>
             </Table.Cell>
         </Table.Row>);
     }

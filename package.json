@@ -6,6 +6,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "axios-extensions": "^3.0.5",
+    "classnames": "^2.2.6",
     "faxios": "^0.6.4",
     "immutability-helper": "^3.0.0",
     "lodash": "^4.17.11",
